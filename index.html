@@ -106,9 +106,7 @@
         .alert-error { background: #ffebee; color: #c62828; }
         .alert-success { background: #e8f5e9; color: #2e7d32; }
 
-        /* ==========================================
-           ESTILOS OFICIALES FORMATO PDF @EnTuLímite
-           ========================================== */
+        /* Estilos Oficiales Formato @EnTuLímite */
         .ficha-header {
             display: flex;
             justify-content: space-between;
@@ -278,16 +276,30 @@
             <label for="micro_objetivo">Compromiso de acción del atleta: Micro-objetivo prioritario (Próximas 2 semanas):</label>
             <textarea id="micro_objetivo" rows="2" placeholder="¿Qué acción específica harás para mejorar?"></textarea>
         </div>
+        
         <div class="form-group">
             <label>Firma Digital del Atleta:</label>
-            <canvas id="sig-canvas" style="border: 1px solid #ccc; background: #fff; border-radius: 6px; width: 100%; height: 130px; touch-action: none;"></canvas>
-            <button type="button" style="margin-top: 5px; font-size: 0.8rem; padding: 4px 8px;" onclick="limpiarFirma()">Borrar Firma</button>
+            <div style="display: flex; gap: 10px; margin-bottom: 8px;" class="no-print">
+                <button type="button" id="tab-draw" class="btn" style="padding: 6px 12px; font-size: 0.85rem; background: var(--primary); margin-top:0;" onclick="cambiarModoFirma('draw')">Dibujar Firma</button>
+                <button type="button" id="tab-text" class="btn" style="padding: 6px 12px; font-size: 0.85rem; background: #6c757d; margin-top:0;" onclick="cambiarModoFirma('text')">Escribir Nombre (Tipográfica)</button>
+            </div>
+
+            <!-- Opción A: Canvas para dibujar -->
+            <div id="contenedor-canvas">
+                <canvas id="sig-canvas" style="border: 1px solid #ccc; background: #fff; border-radius: 6px; width: 100%; height: 130px; touch-action: none;"></canvas>
+                <button type="button" style="margin-top: 5px; font-size: 0.8rem; padding: 4px 8px;" onclick="limpiarFirma()">Borrar Trazo</button>
+            </div>
+
+            <!-- Opción B: Escribir texto -->
+            <div id="contenedor-texto" class="hidden">
+                <input type="text" id="sig-text-input" placeholder="Escribe tu nombre completo como firma" style="font-family: 'Brush Script MT', cursive, sans-serif; font-size: 1.5rem; text-align: center; color: #244777;">
+            </div>
         </div>
 
         <button type="submit" id="btn-submit" class="btn">Generar Ficha de Reporte Oficial</button>
     </form>
 
-    <!-- PASO 3: FICHA DE REPORTE OFICIAL (DESGLOSE COMPLETO Y REAL) -->
+    <!-- PASO 3: FICHA DE REPORTE OFICIAL -->
     <div id="report-view" class="hidden">
         
         <!-- PÁGINA 1 -->
@@ -398,7 +410,7 @@
             <button type="button" class="btn" onclick="location.reload()">Nueva Consulta</button>
         </div>
 
-        <!-- PIE DE PÁGINA INSTITUCIONAL EXACTO -->
+        <!-- PIE DE PÁGINA INSTITUCIONAL -->
         <div class="ficha-footer">
             <div>Desarrollado por Carlos Alberto Vázquez Villegas CEO @entulimite<br>Psicólogo Deportivo y académico de la DGDU-UNAM / Agente Capacitador Externo STPS</div>
             <div style="text-align: right;">Reserva tu evaluación Contacto / WhatsApp: 5513302271 | entulimite.com<br>Evaluación Diagnóstica @EnTuLimite Mind-Check / Todos los derechos reservados</div>
@@ -410,6 +422,7 @@
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwQ7XxNVVB3YebU8uBv0QWj8tP5a52q0ZPkkbKu2-BwLzdNd51mhpWgio2cptnbMEJs/exec";
     let currentAthlete = {};
     let tipoEvaluacionGlobal = "Inicial";
+    let modoFirmaActual = "draw";
     let chartMentalInst = null, chartEstrucInst = null, chartIfmiInst = null;
 
     const nombresPilares = [
@@ -441,6 +454,22 @@
 
     function updateVal(sliderId, valId) {
         document.getElementById(valId).innerText = document.getElementById(sliderId).value;
+    }
+
+    function cambiarModoFirma(modo) {
+        modoFirmaActual = modo;
+        if(modo === 'draw') {
+            document.getElementById("contenedor-canvas").classList.remove("hidden");
+            document.getElementById("contenedor-texto").classList.add("hidden");
+            document.getElementById("tab-draw").style.backgroundColor = "var(--primary)";
+            document.getElementById("tab-text").style.backgroundColor = "#6c757d";
+            resizeCanvas();
+        } else {
+            document.getElementById("contenedor-canvas").classList.add("hidden");
+            document.getElementById("contenedor-texto").classList.remove("hidden");
+            document.getElementById("tab-text").style.backgroundColor = "var(--primary)";
+            document.getElementById("tab-draw").style.backgroundColor = "#6c757d";
+        }
     }
 
     const canvas = document.getElementById("sig-canvas");
@@ -504,6 +533,14 @@
         btn.innerText = "Generando ficha oficial...";
         btn.disabled = true;
 
+        let firmaFinal = "";
+        if (modoFirmaActual === 'draw') {
+            firmaFinal = canvas.toDataURL();
+        } else {
+            let nombreEscrito = document.getElementById("sig-text-input").value.trim() || currentAthlete.nombre;
+            firmaFinal = "Firma: " + nombreEscrito;
+        }
+
         let payload = {
             id_atleta: currentAthlete.id,
             deporte_equipo: currentAthlete.equipo,
@@ -514,7 +551,7 @@
             p4: document.getElementById("p4").value,
             p5: document.getElementById("p5").value,
             micro_objetivo: document.getElementById("micro_objetivo").value,
-            firma_url: canvas.toDataURL()
+            firma_url: firmaFinal
         };
 
         let valoresMentalArr = [payload.p1, payload.p2, payload.p3, payload.p4, payload.p5];
@@ -539,14 +576,12 @@
                 document.getElementById("rep-equipo").innerText = currentAthlete.equipo;
                 document.getElementById("rep-objetivo").innerText = payload.micro_objetivo || "Sin micro-objetivo especificado.";
 
-                // Rellenar tabla detallada de Protocolo Mental (5 Pilares)
                 let tablaMentalHtml = `<tr><th>Pilar / Puntuación</th><th style="text-align:center;">Pts (0-10)</th></tr>`;
                 nombresPilares.forEach((nombre, idx) => {
                     tablaMentalHtml += `<tr><td>${nombre}</td><td style="text-align:center; font-weight:bold; color:var(--primary);">${valoresMentalArr[idx]}</td></tr>`;
                 });
                 document.getElementById("tabla-rep-mental").innerHTML = tablaMentalHtml;
 
-                // Rellenar tabla detallada de Soporte Estructural (13 Factores)
                 let tablaEstrucHtml = `<tr><th>Factor Estructural / Puntuación</th><th style="text-align:center;">Pts (0-10)</th></tr>`;
                 factoresEstrucutrales.forEach((nombre, idx) => {
                     tablaEstrucHtml += `<tr><td>${nombre}</td><td style="text-align:center; font-weight:bold; color:var(--primary);">${valoresEstrucArr[idx]}</td></tr>`;
@@ -589,7 +624,6 @@
                 document.getElementById("rep-zona-desc").innerText = zonaDesc;
                 document.getElementById("rep-zona-estrategia").innerText = zonaEstrategia;
 
-                // Renderizar gráficas con meses reales (respetando meses vacíos si no hubo evaluación)
                 renderRealCronologyChart(result.history || [{month: 'Ene', mental: mentalPorc, estruc: estrucPorc, ifmi: ifmi}]);
             } else {
                 alert("Error al guardar: " + result.message);
@@ -604,7 +638,6 @@
     }
 
     function renderRealCronologyChart(historyArray) {
-        // historyArray contiene los puntos reales por mes en los que el atleta se evaluó (ej. [{month: 'Ene', mental: 85, ...}, {month: 'Mar', mental: 90, ...}])
         const labels = historyArray.map(item => item.month);
         const dataM = historyArray.map(item => item.mental);
         const dataE = historyArray.map(item => item.estruc);
