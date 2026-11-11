@@ -517,7 +517,10 @@
         if(!id) { msgDiv.innerHTML = `<div class="alert alert-error">Por favor ingresa un correo válido.</div>`; return; }
         msgDiv.innerHTML = "Verificando acceso...";
         try {
-            let response = await fetch(`${WEB_APP_URL}?action=check_athlete&id=${id}`);
+            let response = await fetch(`${WEB_APP_URL}?action=check_athlete&id=${encodeURIComponent(id)}`, {
+                method: "GET",
+                redirect: "follow"
+            });
             let data = await response.json();
             if(data.exists) {
                 currentAthlete = { id: id, nombre: data.nombre, equipo: data.equipo, isInitial: data.isInitial };
@@ -575,7 +578,11 @@
         }
 
         try {
-            let response = await fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify(payload) });
+            let response = await fetch(WEB_APP_URL, { 
+                method: "POST", 
+                body: JSON.stringify(payload),
+                redirect: "follow"
+            });
             let result = await response.json();
 
             if(result.status === "success") {
