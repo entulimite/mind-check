@@ -106,6 +106,11 @@
         .alert-error { background: #ffebee; color: #c62828; }
         .alert-success { background: #e8f5e9; color: #2e7d32; }
 
+        /* Tonos Semáforo Sutiles para las Celdas */
+        .semaforo-verde { background-color: #f1f8f2 !important; color: #2e7d32; }
+        .semaforo-amarillo { background-color: #fffde7 !important; color: #f57f17; }
+        .semaforo-rojo { background-color: #ffebee !important; color: #c62828; }
+
         /* Estilos Oficiales Formato @EnTuLímite */
         .ficha-header {
             display: flex;
@@ -370,7 +375,7 @@
 
         <!-- FIRMAS -->
         <div class="signatures-grid">
-            <div class="signature-box">Firma Atleta</div>
+            <div class="signature-box" id="sig-box-atleta">Firma Atleta</div>
             <div class="signature-box">Firma Entrenador</div>
             <div class="signature-box">Firma Padre / Tutor</div>
         </div>
@@ -503,6 +508,13 @@
 
     function limpiarFirma() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
 
+    function obtenerClaseSemaforo(valor) {
+        let v = parseFloat(valor);
+        if (v >= 8) return 'semaforo-verde';
+        if (v >= 5) return 'semaforo-amarillo';
+        return 'semaforo-rojo';
+    }
+
     async function validarAtleta() {
         let id = document.getElementById("id_atleta").value.trim();
         let msgDiv = document.getElementById("auth-msg");
@@ -534,11 +546,15 @@
         btn.disabled = true;
 
         let firmaFinal = "";
+        let sigBoxAtleta = document.getElementById("sig-box-atleta");
+        
         if (modoFirmaActual === 'draw') {
             firmaFinal = canvas.toDataURL();
+            sigBoxAtleta.innerHTML = `<img src="${firmaFinal}" style="max-height: 45px; display: block; margin: 0 auto;"><span style="font-size:0.75rem;">Firma Atleta</span>`;
         } else {
             let nombreEscrito = document.getElementById("sig-text-input").value.trim() || currentAthlete.nombre;
             firmaFinal = "Firma: " + nombreEscrito;
+            sigBoxAtleta.innerHTML = `<div style="font-family: 'Brush Script MT', cursive, sans-serif; font-size: 1.2rem; color: #244777;">${nombreEscrito}</div><span style="font-size:0.75rem;">Firma Atleta</span>`;
         }
 
         let payload = {
@@ -576,15 +592,21 @@
                 document.getElementById("rep-equipo").innerText = currentAthlete.equipo;
                 document.getElementById("rep-objetivo").innerText = payload.micro_objetivo || "Sin micro-objetivo especificado.";
 
+                // Rellenar tabla detallada de Protocolo Mental con tonos semáforo sutiles
                 let tablaMentalHtml = `<tr><th>Pilar / Puntuación</th><th style="text-align:center;">Pts (0-10)</th></tr>`;
                 nombresPilares.forEach((nombre, idx) => {
-                    tablaMentalHtml += `<tr><td>${nombre}</td><td style="text-align:center; font-weight:bold; color:var(--primary);">${valoresMentalArr[idx]}</td></tr>`;
+                    let val = valoresMentalArr[idx];
+                    let claseSemaforo = obtenerClaseSemaforo(val);
+                    tablaMentalHtml += `<tr><td>${nombre}</td><td style="text-align:center; font-weight:bold;" class="${claseSemaforo}">${val}</td></tr>`;
                 });
                 document.getElementById("tabla-rep-mental").innerHTML = tablaMentalHtml;
 
+                // Rellenar tabla detallada de Soporte Estructural con tonos semáforo sutiles
                 let tablaEstrucHtml = `<tr><th>Factor Estructural / Puntuación</th><th style="text-align:center;">Pts (0-10)</th></tr>`;
                 factoresEstrucutrales.forEach((nombre, idx) => {
-                    tablaEstrucHtml += `<tr><td>${nombre}</td><td style="text-align:center; font-weight:bold; color:var(--primary);">${valoresEstrucArr[idx]}</td></tr>`;
+                    let val = valoresEstrucArr[idx];
+                    let claseSemaforo = obtenerClaseSemaforo(val);
+                    tablaEstrucHtml += `<tr><td>${nombre}</td><td style="text-align:center; font-weight:bold;" class="${claseSemaforo}">${val}</td></tr>`;
                 });
                 document.getElementById("tabla-rep-estruc").innerHTML = tablaEstrucHtml;
 
