@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@EnTuLímite Mind-Check | Radiografía Mental Oficial</title>
-    <!-- Librería Chart.js para las 3 gráficas de evolución anual -->
+    <!-- Librería Chart.js para las gráficas de evolución -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -150,35 +150,17 @@
         .ficha-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.88rem;
+            font-size: 0.85rem;
             margin-bottom: 15px;
         }
         .ficha-table th, .ficha-table td {
             border: 1px solid #d0d7de;
-            padding: 8px 10px;
+            padding: 7px 10px;
             text-align: left;
         }
         .ficha-table th {
             background-color: #f0f4f8;
             color: var(--primary);
-        }
-        .cadencia-box {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            font-size: 0.85rem;
-            background: #FAFAFC;
-            padding: 10px;
-            border: 1px solid #d0d7de;
-            border-radius: 6px;
-            margin-bottom: 15px;
-        }
-        .cadencia-box label {
-            font-weight: normal;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
         }
         .ficha-grid-3 {
             display: grid;
@@ -273,27 +255,10 @@
         <div class="ficha-header">
             <div class="ficha-logo">
                 <h1>@EnTuLímite</h1>
-                <span>Evaluación Activa | Mind-Check</span>
+                <span id="form-tipo-eval">Evaluación Activa | Mind-Check</span>
             </div>
         </div>
         <div id="athlete-info" class="alert alert-success" style="font-weight: bold;"></div>
-
-        <div class="ficha-section-title">Selección de Cadencia</div>
-        <div class="cadencia-box">
-            <label><input type="radio" name="cadencia" value="Inicial" checked> Inicial</label>
-            <label><input type="radio" name="cadencia" value="Mes 1"> Mes 1</label>
-            <label><input type="radio" name="cadencia" value="Mes 2"> Mes 2</label>
-            <label><input type="radio" name="cadencia" value="Trimestral (M3)"> Trimestral (M3)</label>
-            <label><input type="radio" name="cadencia" value="Mes 4"> Mes 4</label>
-            <label><input type="radio" name="cadencia" value="Mes 5"> Mes 5</label>
-            <label><input type="radio" name="cadencia" value="Semestral (M6)"> Semestral (M6)</label>
-            <label><input type="radio" name="cadencia" value="Mes 7"> Mes 7</label>
-            <label><input type="radio" name="cadencia" value="Mes 8"> Mes 8</label>
-            <label><input type="radio" name="cadencia" value="Mes 9"> Mes 9</label>
-            <label><input type="radio" name="cadencia" value="Mes 10"> Mes 10</label>
-            <label><input type="radio" name="cadencia" value="Mes 11"> Mes 11</label>
-            <label><input type="radio" name="cadencia" value="Anual (M12)"> Anual (M12)</label>
-        </div>
 
         <div class="ficha-section-title">1. Protocolo Mental (5 Pilares Fundamentales)</div>
         <div style="font-size: 0.82rem; color: #666; margin-bottom: 10px;">Bajo presión, momentos difíciles o tras un error yo califico del 0 al 10:</div>
@@ -322,7 +287,7 @@
         <button type="submit" id="btn-submit" class="btn">Generar Ficha de Reporte Oficial</button>
     </form>
 
-    <!-- PASO 3: FICHA DE REPORTE OFICIAL (IDÉNTICA AL PDF - PÁGINA 1 Y 2) -->
+    <!-- PASO 3: FICHA DE REPORTE OFICIAL (DESGLOSE COMPLETO Y REAL) -->
     <div id="report-view" class="hidden">
         
         <!-- PÁGINA 1 -->
@@ -333,7 +298,7 @@
             </div>
             <div class="ficha-meta">
                 <strong id="rep-fecha">FECHA: --/--/----</strong><br>
-                <span>CADENCIA: <strong id="rep-cadencia" style="color:var(--primary);">--</strong></span>
+                <span>TIPO: <strong id="rep-tipo-eval" style="color:var(--primary);">--</strong></span>
             </div>
         </div>
 
@@ -346,16 +311,28 @@
             </tr>
         </table>
 
+        <!-- DESGLOSE DETALLADO 1: PROTOCOLO MENTAL (5 PILARES) -->
+        <div class="ficha-section-title">1. Protocolo Mental (Detalle de Respuestas)</div>
+        <table class="ficha-table" id="tabla-rep-mental">
+            <tr><th>Pilar / Puntuación</th><th style="width: 15%; text-align:center;">Pts (0-10)</th></tr>
+        </table>
+
+        <!-- DESGLOSE DETALLADO 2: SOPORTE ESTRUCTURAL (13 FACTORES) -->
+        <div class="ficha-section-title">2. Soporte Estructural Deportivo (Detalle de Respuestas)</div>
+        <table class="ficha-table" id="tabla-rep-estruc">
+            <tr><th>Factor Estructural / Puntuación</th><th style="width: 15%; text-align:center;">Pts (0-10)</th></tr>
+        </table>
+
         <!-- MÉTRICAS IFMI -->
         <div class="ficha-section-title">3. Índice de Fortaleza Mental Integrado (IFMI) & Matriz de Diagnóstico</div>
         <div class="ficha-grid-3">
             <div class="ficha-card">
                 <div class="ficha-card-label">1. Dominio Mental (/50 pts)</div>
-                <div class="ficha-card-val" id="rep-mental">0%</div>
+                <div class="ficha-card-val" id="rep-mental-val">0%</div>
             </div>
             <div class="ficha-card">
                 <div class="ficha-card-label">2. Soporte Estructural (/130 pts)</div>
-                <div class="ficha-card-val" id="rep-estruc">0%</div>
+                <div class="ficha-card-val" id="rep-estruc-val">0%</div>
             </div>
             <div class="ficha-card" style="background: var(--accent);">
                 <div class="ficha-card-label" style="color: var(--primary);">Promedio IFMI (Global)</div>
@@ -389,11 +366,11 @@
         <!-- SALTO DE PÁGINA PARA IMPRESIÓN (PÁGINA 2) -->
         <div class="page-break"></div>
 
-        <!-- PÁGINA 2: SEGUIMIENTO GRÁFICO ANUAL (M1 A M12) -->
+        <!-- PÁGINA 2: SEGUIMIENTO GRÁFICO CRONOLÓGICO REAL -->
         <div class="ficha-header" style="margin-top: 20px;">
             <div class="ficha-logo">
                 <h1>@EnTuLímite</h1>
-                <span>Seguimiento Gráfico Anual (Mes 1 a Mes 12)</span>
+                <span>Seguimiento Gráfico Cronológico (Mes a Mes Real)</span>
             </div>
             <div class="ficha-meta">
                 <span>Historial Longitudinal del Atleta</span>
@@ -432,7 +409,16 @@
 <script>
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwQ7XxNVVB3YebU8uBv0QWj8tP5a52q0ZPkkbKu2-BwLzdNd51mhpWgio2cptnbMEJs/exec";
     let currentAthlete = {};
+    let tipoEvaluacionGlobal = "Inicial";
     let chartMentalInst = null, chartEstrucInst = null, chartIfmiInst = null;
+
+    const nombresPilares = [
+        "1. Identificación de Emociones",
+        "2. Respiro para Conciencia",
+        "3. Auto-diálogo Constructivo",
+        "4. Visualización de Ejecución",
+        "5. Agradecimiento y Disfrute"
+    ];
 
     const factoresEstrucutrales = [
         "1. Cumplo mis horas de sueño acorde a mi edad", "2. Alimentación apropiada", "3. Asistencia y puntualidad", 
@@ -497,10 +483,13 @@
             let response = await fetch(`${WEB_APP_URL}?action=check_athlete&id=${id}`);
             let data = await response.json();
             if(data.exists) {
-                currentAthlete = { id: id, nombre: data.nombre, equipo: data.equipo };
+                currentAthlete = { id: id, nombre: data.nombre, equipo: data.equipo, isInitial: data.isInitial };
+                tipoEvaluacionGlobal = data.isInitial ? "Evaluación Inicial" : "Evaluación de Seguimiento";
+
+                document.getElementById("form-tipo-eval").innerText = `${tipoEvaluacionGlobal} | Mind-Check`;
                 document.getElementById("step-auth").classList.add("hidden");
                 document.getElementById("eval-form").classList.remove("hidden");
-                document.getElementById("athlete-info").innerText = `Atleta: ${data.nombre} | Equipo: ${data.equipo}`;
+                document.getElementById("athlete-info").innerText = `Atleta: ${data.nombre} | Equipo: ${data.equipo} (${tipoEvaluacionGlobal})`;
             } else {
                 msgDiv.innerHTML = `<div class="alert alert-error">ID no encontrado o inactivo. Contacta a @entulimite.</div>`;
             }
@@ -515,12 +504,10 @@
         btn.innerText = "Generando ficha oficial...";
         btn.disabled = true;
 
-        let cadenciaSel = document.querySelector('input[name="cadencia"]:checked').value;
-
         let payload = {
             id_atleta: currentAthlete.id,
             deporte_equipo: currentAthlete.equipo,
-            cadencia: cadenciaSel,
+            cadencia: tipoEvaluacionGlobal,
             p1: document.getElementById("p1").value,
             p2: document.getElementById("p2").value,
             p3: document.getElementById("p3").value,
@@ -530,7 +517,13 @@
             firma_url: canvas.toDataURL()
         };
 
-        for(let i=1; i<=13; i++) { payload[`s${i}`] = document.getElementById(`s${i}`).value; }
+        let valoresMentalArr = [payload.p1, payload.p2, payload.p3, payload.p4, payload.p5];
+        let valoresEstrucArr = [];
+
+        for(let i=1; i<=13; i++) { 
+            payload[`s${i}`] = document.getElementById(`s${i}`).value; 
+            valoresEstrucArr.push(payload[`s${i}`]);
+        }
 
         try {
             let response = await fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify(payload) });
@@ -541,25 +534,37 @@
                 document.getElementById("report-view").classList.remove("hidden");
 
                 document.getElementById("rep-fecha").innerText = "FECHA: " + new Date().toLocaleDateString();
-                document.getElementById("rep-cadencia").innerText = cadenciaSel;
+                document.getElementById("rep-tipo-eval").innerText = tipoEvaluacionGlobal;
                 document.getElementById("rep-nombre").innerText = currentAthlete.nombre;
                 document.getElementById("rep-equipo").innerText = currentAthlete.equipo;
                 document.getElementById("rep-objetivo").innerText = payload.micro_objetivo || "Sin micro-objetivo especificado.";
 
-                let mentalSum = parseInt(payload.p1) + parseInt(payload.p2) + parseInt(payload.p3) + parseInt(payload.p4) + parseInt(payload.p5);
+                // Rellenar tabla detallada de Protocolo Mental (5 Pilares)
+                let tablaMentalHtml = `<tr><th>Pilar / Puntuación</th><th style="text-align:center;">Pts (0-10)</th></tr>`;
+                nombresPilares.forEach((nombre, idx) => {
+                    tablaMentalHtml += `<tr><td>${nombre}</td><td style="text-align:center; font-weight:bold; color:var(--primary);">${valoresMentalArr[idx]}</td></tr>`;
+                });
+                document.getElementById("tabla-rep-mental").innerHTML = tablaMentalHtml;
+
+                // Rellenar tabla detallada de Soporte Estructural (13 Factores)
+                let tablaEstrucHtml = `<tr><th>Factor Estructural / Puntuación</th><th style="text-align:center;">Pts (0-10)</th></tr>`;
+                factoresEstrucutrales.forEach((nombre, idx) => {
+                    tablaEstrucHtml += `<tr><td>${nombre}</td><td style="text-align:center; font-weight:bold; color:var(--primary);">${valoresEstrucArr[idx]}</td></tr>`;
+                });
+                document.getElementById("tabla-rep-estruc").innerHTML = tablaEstrucHtml;
+
+                let mentalSum = valoresMentalArr.reduce((a, b) => parseInt(a) + parseInt(b), 0);
                 let mentalPorc = ((mentalSum / 50) * 100).toFixed(1);
                 
-                let estrucSum = 0;
-                for(let i=1; i<=13; i++) estrucSum += parseInt(payload[`s${i}`]);
+                let estrucSum = valoresEstrucArr.reduce((a, b) => parseInt(a) + parseInt(b), 0);
                 let estrucPorc = ((estrucSum / 130) * 100).toFixed(1);
 
                 let ifmi = ((parseFloat(mentalPorc) + parseFloat(estrucPorc)) / 2).toFixed(1);
 
-                document.getElementById("rep-mental").innerText = mentalPorc + "% (" + mentalSum + "/50)";
-                document.getElementById("rep-estruc").innerText = estrucPorc + "% (" + estrucSum + "/130)";
+                document.getElementById("rep-mental-val").innerText = mentalPorc + "% (" + mentalSum + "/50)";
+                document.getElementById("rep-estruc-val").innerText = estrucPorc + "% (" + estrucSum + "/130)";
                 document.getElementById("rep-ifmi").innerText = ifmi + "%";
 
-                // Definición exacta de Zonas según tu PDF oficial
                 let zonaTitulo = "", zonaDesc = "", zonaEstrategia = "";
                 
                 if(mentalPorc >= 80 && estrucPorc >= 80) {
@@ -584,8 +589,8 @@
                 document.getElementById("rep-zona-desc").innerText = zonaDesc;
                 document.getElementById("rep-zona-estrategia").innerText = zonaEstrategia;
 
-                // Renderizar las 3 gráficas anuales (M1 a M12)
-                renderCharts([mentalPorc], [estrucPorc], [ifmi]);
+                // Renderizar gráficas con meses reales (respetando meses vacíos si no hubo evaluación)
+                renderRealCronologyChart(result.history || [{month: 'Ene', mental: mentalPorc, estruc: estrucPorc, ifmi: ifmi}]);
             } else {
                 alert("Error al guardar: " + result.message);
                 btn.innerText = "Generar Ficha de Reporte Oficial";
@@ -598,13 +603,12 @@
         }
     }
 
-    function renderCharts(valMental, valEstruc, valIfmi) {
-        const months = ['M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8', 'M9', 'M10', 'M11', 'M12'];
-        
-        // Datos actuales mapeados a M1 (o al mes correspondiente)
-        let dataM = new Array(12).fill(null); dataM[0] = valMental[0];
-        let dataE = new Array(12).fill(null); dataE[0] = valEstruc[0];
-        let dataI = new Array(12).fill(null); dataI[0] = valIfmi[0];
+    function renderRealCronologyChart(historyArray) {
+        // historyArray contiene los puntos reales por mes en los que el atleta se evaluó (ej. [{month: 'Ene', mental: 85, ...}, {month: 'Mar', mental: 90, ...}])
+        const labels = historyArray.map(item => item.month);
+        const dataM = historyArray.map(item => item.mental);
+        const dataE = historyArray.map(item => item.estruc);
+        const dataI = historyArray.map(item => item.ifmi);
 
         if (chartMentalInst) chartMentalInst.destroy();
         if (chartEstrucInst) chartEstrucInst.destroy();
@@ -618,19 +622,19 @@
 
         chartMentalInst = new Chart(document.getElementById('chartMental').getContext('2d'), {
             type: 'line',
-            data: { labels: months, datasets: [{ label: '% Mental', data: dataM, borderColor: '#244777', backgroundColor: 'rgba(36, 71, 119, 0.1)', borderWidth: 2, fill: true, tension: 0.2 }] },
+            data: { labels: labels, datasets: [{ label: '% Mental', data: dataM, borderColor: '#244777', backgroundColor: 'rgba(36, 71, 119, 0.1)', borderWidth: 2, fill: true, tension: 0.2, spanGaps: false }] },
             options: commonOptions
         });
 
         chartEstrucInst = new Chart(document.getElementById('chartEstruc').getContext('2d'), {
             type: 'line',
-            data: { labels: months, datasets: [{ label: '% Estructural', data: dataE, borderColor: '#3E5F90', backgroundColor: 'rgba(62, 95, 144, 0.1)', borderWidth: 2, fill: true, tension: 0.2 }] },
+            data: { labels: labels, datasets: [{ label: '% Estructural', data: dataE, borderColor: '#3E5F90', backgroundColor: 'rgba(62, 95, 144, 0.1)', borderWidth: 2, fill: true, tension: 0.2, spanGaps: false }] },
             options: commonOptions
         });
 
         chartIfmiInst = new Chart(document.getElementById('chartIfmi').getContext('2d'), {
             type: 'line',
-            data: { labels: months, datasets: [{ label: 'Promedio IFMI (%)', data: dataI, borderColor: '#2e7d32', backgroundColor: 'rgba(46, 125, 50, 0.1)', borderWidth: 2, fill: true, tension: 0.2 }] },
+            data: { labels: labels, datasets: [{ label: 'Promedio IFMI (%)', data: dataI, borderColor: '#2e7d32', backgroundColor: 'rgba(46, 125, 50, 0.1)', borderWidth: 2, fill: true, tension: 0.2, spanGaps: false }] },
             options: commonOptions
         });
     }
