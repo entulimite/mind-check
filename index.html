@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@EnTuLímite Mind-Check | Radiografía Mental</title>
+    <style>
+        :root {
+            --primary: #244777;
+            --secondary: #3E5F90;
+            --accent: #D9E3F8;
+            --bg: #F9F9FF;
+            --text: #1A1C1E;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 650px;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        h2, h3 {
+            color: var(--primary);
+            text-align: center;
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 0.95rem;
+            color: #555;
+            margin-bottom: 25px;
+        }
+        .section-box {
+            background: var(--bg);
+            border-left: 4px solid var(--secondary);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        .slider-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fff;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border: 1px solid #e0e0e0;
+        }
+        .slider-container label {
+            flex: 2;
+            margin-bottom: 0;
+            font-weight: normal;
+            font-size: 0.88rem;
+        }
+        .slider-container input {
+            flex: 1;
+            margin: 0 10px;
+        }
+        .slider-val {
+            font-weight: bold;
+            color: var(--primary);
+            width: 25px;
+            text-align: center;
+        }
+        canvas {
+            border: 1px solid #ccc;
+            background: #fff;
+            border-radius: 6px;
+            width: 100%;
+            height: 150px;
+            touch-action: none;
+        }
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            width: 100%;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.2s;
+        }
+        .btn:hover {
+            background-color: var(--secondary);
+        }
+        .hidden { display: none; }
+        .alert {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        .alert-error { background: #ffebee; color: #c62828; }
+        .alert-success { background: #e8f5e9; color: #2e7d32; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>@EnTuLímite Mind-Check</h2>
+    <div class="subtitle">Radiografía Mental y Diagnóstico Estructural del Atleta</div>
+
+    <!-- PASO 1: VALIDACIÓN DE ID -->
+    <div id="step-auth" class="section-box">
+        <h3>Identificación del Atleta</h3>
+        <div class="form-group">
+            <label for="id_atleta">Ingresa tu ID de Atleta (Ej. Matrícula UNAM o Membresía):</label>
+            <input type="text" id="id_atleta" placeholder="Ej. 318092834 o MEM-2026-001">
+        </div>
+        <button type="button" class="btn" onclick="validarAtleta()">Validar Acceso</button>
+        <div id="auth-msg" style="margin-top: 10px;"></div>
+    </div>
+
+    <!-- PASO 2: FORMULARIO DE EVALUACIÓN -->
+    <form id="eval-form" class="hidden" onsubmit="enviarEvaluacion(event)">
+        <div id="athlete-info" class="alert alert-success" style="font-weight: bold;"></div>
+
+        <!-- PROTOCOLO MENTAL -->
+        <div class="section-box">
+            <h3>1. Protocolo Mental (5 Pilares)</h3>
+            <p style="font-size: 0.82rem; color: #666;">Califica de 0 a 10 tu nivel de dominio ante la presión o el error:</p>
+            
+            <div class="slider-container">
+                <label>1. Identificación de Emociones</label>
+                <input type="range" min="0" max="10" value="5" id="p1" oninput="updateVal('p1', 'v1')">
+                <span id="v1" class="slider-val">5</span>
+            </div>
+            <div class="slider-container">
+                <label>2. Respiro para Conciencia</label>
+                <input type="range" min="0" max="10" value="5" id="p2" oninput="updateVal('p2', 'v2')">
+                <span id="v2" class="slider-val">5</span>
+            </div>
+            <div class="slider-container">
+                <label>3. Auto-diálogo Constructivo</label>
+                <input type="range" min="0" max="10" value="5" id="p3" oninput="updateVal('p3', 'v3')">
+                <span id="v3" class="slider-val">5</span>
+            </div>
+            <div class="slider-container">
+                <label>4. Visualización de Ejecución</label>
+                <input type="range" min="0" max="10" value="5" id="p4" oninput="updateVal('p4', 'v4')">
+                <span id="v4" class="slider-val">5</span>
+            </div>
+            <div class="slider-container">
+                <label>5. Agradecimiento y Disfrute</label>
+                <input type="range" min="0" max="10" value="5" id="p5" oninput="updateVal('p5', 'v5')">
+                <span id="v5" class="slider-val">5</span>
+            </div>
+        </div>
+
+        <!-- SOPORTE ESTRUCTURAL -->
+        <div class="section-box">
+            <h3>2. Soporte Estructural Deportivo (13 Factores)</h3>
+            <p style="font-size: 0.82rem; color: #666;">Valora del 0 al 10 el cumplimiento real de tus bases:</p>
+            
+            <div id="structural-sliders"></div>
+        </div>
+
+        <!-- COMPROMISO Y FIRMA -->
+        <div class="section-box">
+            <h3>3. Compromiso y Validación</h3>
+            <div class="form-group">
+                <label for="micro_objetivo">Micro-objetivo prioritario (Próximas 2 semanas):</label>
+                <textarea id="micro_objetivo" rows="2" placeholder="¿Qué acción específica harás para mejorar?"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Firma Digital del Atleta:</label>
+                <canvas id="sig-canvas"></canvas>
+                <button type="button" style="margin-top: 5px; font-size: 0.8rem; padding: 4px 8px;" onclick="limpiarFirma()">Borrar Firma</button>
+            </div>
+        </div>
+
+        <button type="submit" id="btn-submit" class="btn">Enviar Radiografía Mental</button>
+    </form>
+</div>
+
+<script>
+    // URL DE TU PUENTE DE APPS SCRIPT
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwQ7XxNVVB3YebU8uBv0QWj8tP5a52q0ZPkkbKu2-BwLzdNd51mhpWgio2cptnbMEJs/exec";
+
+    let currentAthlete = {};
+
+    // Generar sliders estructurales automáticamente
+    const factoresEstrucutrales = [
+        "1. Horas de sueño", "2. Nutrición e hidratación", "3. Asistencia y puntualidad", 
+        "4. Obediencia en entrenamientos", "5. Buena actitud", "6. Dominio técnico", 
+        "7. Dominio táctico", "8. Resistencia física", "9. Flexibilidad", 
+        "10. Fuerza y potencia", "11. Agilidad y reacción", "12. Esfuerzo al 100%", "13. Disfrute"
+    ];
+
+    const structContainer = document.getElementById("structural-sliders");
+    factoresEstrucutrales.forEach((factor, index) => {
+        let num = index + 1;
+        structContainer.innerHTML += `
+            <div class="slider-container">
+                <label>${factor}</label>
+                <input type="range" min="0" max="10" value="5" id="s${num}" oninput="updateVal('s${num}', 'vs${num}')">
+                <span id="vs${num}" class="slider-val">5</span>
+            </div>
+        `;
+    });
+
+    function updateVal(sliderId, valId) {
+        document.getElementById(valId).innerText = document.getElementById(sliderId).value;
+    }
+
+    // Configuración del Canvas para Firma Digital
+    const canvas = document.getElementById("sig-canvas");
+    const ctx = canvas.getContext("2d");
+    let painting = false;
+
+    function resizeCanvas() {
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+    }
+    window.addEventListener("load", resizeCanvas);
+
+    function startPosition(e) { painting = true; draw(e); }
+    function endPosition() { painting = false; ctx.beginPath(); }
+    function draw(e) {
+        if (!painting) return;
+        ctx.lineWidth = 2;
+        ctx.lineCap = "round";
+        ctx.strokeStyle = "#244777";
+
+        const rect = canvas.getBoundingClientRect();
+        let x = (e.clientX || e.touches[0].clientX) - rect.left;
+        let y = (e.clientY || e.touches[0].clientY) - rect.top;
+
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    }
+
+    canvas.addEventListener("mousedown", startPosition);
+    canvas.addEventListener("mouseup", endPosition);
+    canvas.addEventListener("mousemove", draw);
+
+    canvas.addEventListener("touchstart", startPosition);
+    canvas.addEventListener("touchend", endPosition);
+    canvas.addEventListener("touchmove", draw);
+
+    function limpiarFirma() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // Validación de Atleta contra el Google Sheet
+    async function validarAtleta() {
+        let id = document.getElementById("id_atleta").value.trim();
+        let msgDiv = document.getElementById("auth-msg");
+
+        if(!id) {
+            msgDiv.innerHTML = `<div class="alert alert-error">Por favor ingresa un ID válido.</div>`;
+            return;
+        }
+
+        msgDiv.innerHTML = "Verificando acceso...";
+
+        try {
+            let response = await fetch(`${WEB_APP_URL}?action=check_athlete&id=${id}`);
+            let data = await response.json();
+
+            if(data.exists) {
+                currentAthlete = { id: id, nombre: data.nombre, equipo: data.equipo };
+                document.getElementById("step-auth").classList.add("hidden");
+                document.getElementById("eval-form").classList.remove("hidden");
+                document.getElementById("athlete-info").innerText = `Atleta: ${data.nombre} | Equipo: ${data.equipo}`;
+            } else {
+                msgDiv.innerHTML = `<div class="alert alert-error">ID no encontrado o inactivo. Contacta a @entulimite.</div>`;
+            }
+        } catch(e) {
+            msgDiv.innerHTML = `<div class="alert alert-error">Error de conexión con el servidor. Intenta de nuevo.</div>`;
+        }
+    }
+
+    // Envío de la Evaluación al Google Sheet
+    async function enviarEvaluacion(e) {
+        e.preventDefault();
+        let btn = document.getElementById("btn-submit");
+        btn.innerText = "Enviando registros...";
+        btn.disabled = true;
+
+        let payload = {
+            id_atleta: currentAthlete.id,
+            deporte_equipo: currentAthlete.equipo,
+            p1: document.getElementById("p1").value,
+            p2: document.getElementById("p2").value,
+            p3: document.getElementById("p3").value,
+            p4: document.getElementById("p4").value,
+            p5: document.getElementById("p5").value,
+            micro_objetivo: document.getElementById("micro_objetivo").value,
+            firma_url: canvas.toDataURL() // Guarda la firma en formato imagen base64 temporal
+        };
+
+        for(let i=1; i<=13; i++) {
+            payload[`s${i}`] = document.getElementById(`s${i}`).value;
+        }
+
+        try {
+            let response = await fetch(WEB_APP_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+            let result = await response.json();
+
+            if(result.status === "success") {
+                alert("¡Radiografía Mental guardada con éxito en el Master System!");
+                location.reload();
+            } else {
+                alert("Hubo un error al guardar: " + result.message);
+                btn.innerText = "Enviar Radiografía Mental";
+                btn.disabled = false;
+            }
+        } catch(err) {
+            alert("Error de red al enviar la evaluación.");
+            btn.innerText = "Enviar Radiografía Mental";
+            btn.disabled = false;
+        }
+    }
+</script>
+
+</body>
+</html>
+
