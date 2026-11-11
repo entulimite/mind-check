@@ -250,8 +250,8 @@
         <div style="background: #FAFAFC; border-left: 4px solid var(--secondary); padding: 20px; border-radius: 6px; margin-top: 20px;">
             <h3>Identificación del Atleta</h3>
             <div class="form-group">
-                <label for="id_atleta">Ingresa tu correo electrónico registrado (ID de Acceso):</label>
-                <input type="text" id="id_atleta" placeholder="atleta@correo.com">
+                <label for="id_atleta">Ingresa tu ID de Atleta (Matrícula UNAM o Membresía):</label>
+                <input type="text" id="id_atleta" placeholder="Ej. ATL-001 o MEM-2026-001">
             </div>
             <button type="button" class="btn" onclick="validarAtleta()">Validar Acceso</button>
             <div id="auth-msg" style="margin-top: 10px;"></div>
@@ -294,11 +294,13 @@
                 <button type="button" id="tab-text" class="btn" style="padding: 6px 12px; font-size: 0.85rem; background: #6c757d; margin-top:0;" onclick="cambiarModoFirma('text')">Escribir Nombre (Tipográfica)</button>
             </div>
 
+            <!-- Opción A: Canvas para dibujar -->
             <div id="contenedor-canvas">
                 <canvas id="sig-canvas" style="border: 1px solid #ccc; background: #fff; border-radius: 6px; width: 100%; height: 130px; touch-action: none;"></canvas>
                 <button type="button" style="margin-top: 5px; font-size: 0.8rem; padding: 4px 8px;" onclick="limpiarFirma()">Borrar Trazo</button>
             </div>
 
+            <!-- Opción B: Escribir texto -->
             <div id="contenedor-texto" class="hidden">
                 <input type="text" id="sig-text-input" placeholder="Escribe tu nombre completo como firma" style="font-family: 'Brush Script MT', cursive, sans-serif; font-size: 1.5rem; text-align: center; color: #244777;">
             </div>
@@ -331,13 +333,13 @@
             </tr>
         </table>
 
-        <!-- DESGLOSE DETALLADO 1 -->
+        <!-- DESGLOSE DETALLADO 1: PROTOCOLO MENTAL (5 PILARES) -->
         <div class="ficha-section-title">1. Protocolo Mental (Detalle de Respuestas)</div>
         <table class="ficha-table" id="tabla-rep-mental">
             <tr><th>Pilar / Puntuación</th><th style="width: 15%; text-align:center;">Pts (0-10)</th></tr>
         </table>
 
-        <!-- DESGLOSE DETALLADO 2 -->
+        <!-- DESGLOSE DETALLADO 2: SOPORTE ESTRUCTURAL (13 FACTORES) -->
         <div class="ficha-section-title">2. Soporte Estructural Deportivo (Detalle de Respuestas)</div>
         <table class="ficha-table" id="tabla-rep-estruc">
             <tr><th>Factor Estructural / Puntuación</th><th style="width: 15%; text-align:center;">Pts (0-10)</th></tr>
@@ -360,6 +362,7 @@
             </div>
         </div>
 
+        <!-- DESCRIPCIÓN DETALLADA DE LA ZONA Y DIAGNÓSTICO -->
         <div class="zona-box">
             <div style="font-size: 0.78rem; font-weight: bold; color: #555; text-transform: uppercase;">Zona Asignada & Diagnóstico del Atleta:</div>
             <div id="rep-zona-titulo" style="font-size: 1.1rem; font-weight: bold; color: var(--primary); margin: 4px 0;">--</div>
@@ -371,17 +374,21 @@
             <p id="rep-zona-estrategia" style="font-size: 0.85rem; margin: 4px 0 0 0; color: #444;">--</p>
         </div>
 
+        <!-- MICRO-OBJETIVO -->
         <div class="ficha-section-title">Compromiso de Acción: Micro-objetivo (Próximas 2 semanas)</div>
         <div id="rep-objetivo" style="background: #FAFAFC; padding: 10px; border-radius: 4px; border: 1px solid #d0d7de; margin-bottom: 15px; font-size: 0.9rem;">--</div>
 
+        <!-- FIRMAS -->
         <div class="signatures-grid">
             <div class="signature-box" id="sig-box-atleta">Firma Atleta</div>
             <div class="signature-box">Firma Entrenador</div>
             <div class="signature-box">Firma Padre / Tutor</div>
         </div>
 
+        <!-- SALTO DE PÁGINA PARA IMPRESIÓN (PÁGINA 2) -->
         <div class="page-break"></div>
 
+        <!-- PÁGINA 2: SEGUIMIENTO GRÁFICO CRONOLÓGICO REAL -->
         <div class="ficha-header" style="margin-top: 20px;">
             <div class="ficha-logo">
                 <h1>@EnTuLímite</h1>
@@ -407,11 +414,13 @@
             <canvas id="chartIfmi"></canvas>
         </div>
 
+        <!-- ACCIONES DE IMPRESIÓN -->
         <div style="display: flex; gap: 10px;" class="no-print">
             <button type="button" class="btn btn-print" onclick="window.print()">Imprimir / Guardar Ficha Oficial como PDF</button>
             <button type="button" class="btn" onclick="location.reload()">Nueva Consulta</button>
         </div>
 
+        <!-- PIE DE PÁGINA INSTITUCIONAL -->
         <div class="ficha-footer">
             <div>Desarrollado por Carlos Alberto Vázquez Villegas CEO @entulimite<br>Psicólogo Deportivo y académico de la DGDU-UNAM / Agente Capacitador Externo STPS</div>
             <div style="text-align: right;">Reserva tu evaluación Contacto / WhatsApp: 5513302271 | entulimite.com<br>Evaluación Diagnóstica @EnTuLimite Mind-Check / Todos los derechos reservados</div>
@@ -447,7 +456,7 @@
         structContainer.innerHTML += `
             <div class="slider-container">
                 <label>${factor}</label>
-                <input type="range" min="0" max="10" value="5" id="s${num}" oninput="updateVal('s${num}', 'vs${num}')">
+                <input type="range" min="0" max="10" value="5" id="snum"oninput="updateVal('s{num}', 'vs${num}')">
                 <span id="vs${num}" class="slider-val">5</span>
             </div>
         `;
@@ -514,13 +523,10 @@
     async function validarAtleta() {
         let id = document.getElementById("id_atleta").value.trim();
         let msgDiv = document.getElementById("auth-msg");
-        if(!id) { msgDiv.innerHTML = `<div class="alert alert-error">Por favor ingresa un correo válido.</div>`; return; }
+        if(!id) { msgDiv.innerHTML = `<div class="alert alert-error">Por favor ingresa un ID válido.</div>`; return; }
         msgDiv.innerHTML = "Verificando acceso...";
         try {
-            let response = await fetch(`${WEB_APP_URL}?action=check_athlete&id=${encodeURIComponent(id)}`, {
-                method: "GET",
-                redirect: "follow"
-            });
+            let response = await fetch(`WEBAPPURL?action=checkathlete&id={id}`);
             let data = await response.json();
             if(data.exists) {
                 currentAthlete = { id: id, nombre: data.nombre, equipo: data.equipo, isInitial: data.isInitial };
@@ -529,9 +535,9 @@
                 document.getElementById("form-tipo-eval").innerText = `${tipoEvaluacionGlobal} | Mind-Check`;
                 document.getElementById("step-auth").classList.add("hidden");
                 document.getElementById("eval-form").classList.remove("hidden");
-                document.getElementById("athlete-info").innerText = `Atleta: ${data.nombre} | Deporte: ${data.equipo} (${tipoEvaluacionGlobal})`;
+                document.getElementById("athlete-info").innerText = `Atleta: ${data.nombre} | Equipo: data.equipo({tipoEvaluacionGlobal})`;
             } else {
-                msgDiv.innerHTML = `<div class="alert alert-error">Correo no encontrado o inactivo. Contacta a @entulimite.</div>`;
+                msgDiv.innerHTML = `<div class="alert alert-error">ID no encontrado o inactivo. Contacta a @entulimite.</div>`;
             }
         } catch(e) {
             msgDiv.innerHTML = `<div class="alert alert-error">Error de conexión con el servidor. Intenta de nuevo.</div>`;
@@ -573,16 +579,12 @@
         let valoresEstrucArr = [];
 
         for(let i=1; i<=13; i++) { 
-            payload[`s${i}`] = document.getElementById(`s${i}`).value; 
+            payload[`si`]=document.getElementById(`s{i}`).value; 
             valoresEstrucArr.push(payload[`s${i}`]);
         }
 
         try {
-            let response = await fetch(WEB_APP_URL, { 
-                method: "POST", 
-                body: JSON.stringify(payload),
-                redirect: "follow"
-            });
+            let response = await fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify(payload) });
             let result = await response.json();
 
             if(result.status === "success") {
@@ -599,7 +601,7 @@
                 nombresPilares.forEach((nombre, idx) => {
                     let val = valoresMentalArr[idx];
                     let claseSemaforo = obtenerClaseSemaforo(val);
-                    tablaMentalHtml += `<tr><td>${nombre}</td><td style="text-align:center; font-weight:bold;" class="${claseSemaforo}">${val}</td></tr>`;
+                    tablaMentalHtml += `<tr><td>nombre</td><tdstyle="text-align:center;font-weight:bold;"class="{claseSemaforo}">${val}</td></tr>`;
                 });
                 document.getElementById("tabla-rep-mental").innerHTML = tablaMentalHtml;
 
@@ -607,7 +609,7 @@
                 factoresEstrucutrales.forEach((nombre, idx) => {
                     let val = valoresEstrucArr[idx];
                     let claseSemaforo = obtenerClaseSemaforo(val);
-                    tablaEstrucHtml += `<tr><td>${nombre}</td><td style="text-align:center; font-weight:bold;" class="${claseSemaforo}">${val}</td></tr>`;
+                    tablaEstrucHtml += `<tr><td>nombre</td><tdstyle="text-align:center;font-weight:bold;"class="{claseSemaforo}">${val}</td></tr>`;
                 });
                 document.getElementById("tabla-rep-estruc").innerHTML = tablaEstrucHtml;
 
@@ -628,25 +630,26 @@
                 if(mentalPorc >= 80 && estrucPorc >= 80) {
                     zonaTitulo = "ZONA 1: FORTALEZA INTEGRADA";
                     zonaDesc = "Atleta constante en cuerpo y mente. Sus hábitos físicos sostienen sus rituales mentales. Alineación total.";
-                    zonaEstrategia = "Afinación fina, liderazgo, simulación de escenarios de máxima presión y consolidación de hábitos.";
+                    zonaEstrategia = "Afinación fina, liderazgo, simulación de escenarios de máxima presión y consolidación de hábitos. (Planificar cargas de trabajo)";
                 } else if(mentalPorc >= 80 && estrucPorc < 80) {
                     zonaTitulo = "ZONA 2: FUGA ESTRUCTURAL";
                     zonaDesc = "Mente entrenada, pero el rendimiento disminuye por fallas en la estructura deportiva entorno o físico (sueño, nutrición, descanso, etc.).";
                     zonaEstrategia = "Padres/entrenadores: El problema no es la mente, sino la falta de soporte y descanso. Ajustar la micro-rutina diaria.";
                 } else if(mentalPorc < 80 && estrucPorc >= 80) {
                     zonaTitulo = "ZONA 3: DÉFICIT AUTORREGULACIÓN";
-                    zonaDesc = "Cumple con la estructura de soporte, pero carece de constancia en sus 5 rituales mentales diarios.";
-                    zonaEstrategia = "Atleta: Ajustar la micro-rutina diaria y establecer anclajes cortos para automatizar confianza.";
+                    zonaDesc = "Cumple con la estructura de soporte, pero carece de constancia en sus 5 rituales mentales diarios (Protocolo mental).";
+                    zonaEstrategia = "Atleta: Ajustar la micro-rutina diaria y establecer anclajes cortos para automatizar confianza sin depender de lo externo ni de resultados.";
                 } else {
                     zonaTitulo = "ZONA 4: ALERTA RENDIMIENTO";
                     zonaDesc = "Vulnerabilidad crítica en hábitos de vida y en control emocional/mental. Opera bajo el mínimo funcional.";
-                    zonaEstrategia = "Reestructuración: Sesión prioritaria profunda entre atleta, padres y entrenadores.";
+                    zonaEstrategia = "Reestructuración: Sesión prioritaria profunda entre atleta, padres y entrenadores para reconstruir toda la base estructural y psicológica.";
                 }
 
                 document.getElementById("rep-zona-titulo").innerText = zonaTitulo;
                 document.getElementById("rep-zona-desc").innerText = zonaDesc;
                 document.getElementById("rep-zona-estrategia").innerText = zonaEstrategia;
 
+                // Usar el historial real devuelto por Apps Script, o calcular el mes actual si viene vacío
                 let historialFinal = result.history;
                 if (!historialFinal || historialFinal.length === 0) {
                     const mesesNombres = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
@@ -669,32 +672,40 @@
 
     function renderRealCronologyChart(historyArray) {
         const labels = historyArray.map(item => item.month);
-        const dataMental = historyArray.map(item => item.mental);
-        const dataEstruc = historyArray.map(item => item.estruc);
-        const dataIfmi = historyArray.map(item => item.ifmi);
+        const dataM = historyArray.map(item => item.mental);
+        const dataE = historyArray.map(item => item.estruc);
+        const dataI = historyArray.map(item => item.ifmi);
 
-        if(chartMentalInst) chartMentalInst.destroy();
-        if(chartEstrucInst) chartEstrucInst.destroy();
-        if(chartIfmiInst) chartIfmiInst.destroy();
+        if (chartMentalInst) chartMentalInst.destroy();
+        if (chartEstrucInst) chartEstrucInst.destroy();
+        if (chartIfmiInst) chartIfmiInst.destroy();
+
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { y: { min: 0, max: 100 } }
+        };
 
         chartMentalInst = new Chart(document.getElementById('chartMental').getContext('2d'), {
             type: 'line',
-            data: { labels: labels, datasets: [{ label: '% Mental', data: dataMental, borderColor: '#244777', backgroundColor: 'rgba(36, 71, 119, 0.1)', fill: true, tension: 0.2 }] },
-            options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100 } } }
+            data: { labels: labels, datasets: [{ label: '% Mental', data: dataM, borderColor: '#244777', backgroundColor: 'rgba(36, 71, 119, 0.1)', borderWidth: 2, fill: true, tension: 0.2, spanGaps: false }] },
+            options: commonOptions
         });
 
         chartEstrucInst = new Chart(document.getElementById('chartEstruc').getContext('2d'), {
             type: 'line',
-            data: { labels: labels, datasets: [{ label: '% Estructural', data: dataEstruc, borderColor: '#3E5F90', backgroundColor: 'rgba(62, 95, 144, 0.1)', fill: true, tension: 0.2 }] },
-            options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100 } } }
+            data: { labels: labels, datasets: [{ label: '% Estructural', data: dataE, borderColor: '#3E5F90', backgroundColor: 'rgba(62, 95, 144, 0.1)', borderWidth: 2, fill: true, tension: 0.2, spanGaps: false }] },
+            options: commonOptions
         });
 
         chartIfmiInst = new Chart(document.getElementById('chartIfmi').getContext('2d'), {
             type: 'line',
-            data: { labels: labels, datasets: [{ label: 'Promedio IFMI (%)', data: dataIfmi, borderColor: '#2e7d32', backgroundColor: 'rgba(46, 125, 50, 0.1)', fill: true, tension: 0.2 }] },
-            options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100 } } }
+            data: { labels: labels, datasets: [{ label: 'Promedio IFMI (%)', data: dataI, borderColor: '#2e7d32', backgroundColor: 'rgba(46, 125, 50, 0.1)', borderWidth: 2, fill: true, tension: 0.2, spanGaps: false }] },
+            options: commonOptions
         });
     }
 </script>
+
 </body>
 </html>
+
