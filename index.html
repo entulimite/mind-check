@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@EnTuLímite Mind-Check | Radiografía Mental</title>
+    <title>@EnTuLímite Mind-Check | Ficha de Reporte y Diagnóstico</title>
+    <!-- Librería Chart.js para las gráficas de evolución -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary: #244777;
@@ -23,7 +25,7 @@
         }
         .container {
             width: 100%;
-            max-width: 650px;
+            max-width: 750px;
             background: #ffffff;
             padding: 30px;
             border-radius: 12px;
@@ -32,6 +34,7 @@
         h2, h3 {
             color: var(--primary);
             text-align: center;
+            margin-top: 0;
         }
         .subtitle {
             text-align: center;
@@ -40,7 +43,7 @@
             margin-bottom: 25px;
         }
         .section-box {
-            background: var(--bg);
+            background: #FAFAFC;
             border-left: 4px solid var(--secondary);
             padding: 15px;
             margin-bottom: 20px;
@@ -88,7 +91,7 @@
             width: 25px;
             text-align: center;
         }
-        canvas {
+        canvas-sig {
             border: 1px solid #ccc;
             background: #fff;
             border-radius: 6px;
@@ -106,15 +109,16 @@
             font-weight: bold;
             border-radius: 6px;
             cursor: pointer;
-            margin-top: 20px;
+            margin-top: 15px;
             transition: background 0.2s;
         }
-        .btn:hover {
-            background-color: var(--secondary);
-        }
-        .hidden { display: none; }
+        .btn:hover { background-color: var(--secondary); }
+        .btn-print { background-color: #2e7d32; }
+        .btn-print:hover { background-color: #1b5e20; }
+        
+        .hidden { display: none !important; }
         .alert {
-            padding: 10px;
+            padding: 12px;
             border-radius: 5px;
             margin-bottom: 15px;
             font-size: 0.9rem;
@@ -122,27 +126,66 @@
         }
         .alert-error { background: #ffebee; color: #c62828; }
         .alert-success { background: #e8f5e9; color: #2e7d32; }
+
+        /* Estilos específicos para la Ficha de Reporte Impresa */
+        .report-header {
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .report-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .metric-card {
+            background: #fff;
+            border: 1px solid #d0d7de;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; padding: 0; max-width: 100%; }
+            .no-print { display: none !important; }
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>@EnTuLímite Mind-Check</h2>
-    <div class="subtitle">Radiografía Mental y Diagnóstico Estructural del Atleta</div>
+    <div class="report-header">
+        <div>
+            <h2>@EnTuLímite Mind-Check</h2>
+            <div style="font-size: 0.85rem; color: #555;">Sistema de Evaluación y Psicología del Deporte</div>
+        </div>
+        <div style="text-align: right; font-size: 0.85rem; color: #666;" id="print-date"></div>
+    </div>
 
     <!-- PASO 1: VALIDACIÓN DE ID -->
-    <div id="step-auth" class="section-box">
+    <div id="step-auth" class="section-box no-print">
         <h3>Identificación del Atleta</h3>
         <div class="form-group">
             <label for="id_atleta">Ingresa tu ID de Atleta (Ej. Matrícula UNAM o Membresía):</label>
-            <input type="text" id="id_atleta" placeholder="Ej. 318092834 o MEM-2026-001">
+            <input type="text" id="id_atleta" placeholder="Ej. ATL-001 o MEM-2026-001">
         </div>
         <button type="button" class="btn" onclick="validarAtleta()">Validar Acceso</button>
         <div id="auth-msg" style="margin-top: 10px;"></div>
     </div>
 
     <!-- PASO 2: FORMULARIO DE EVALUACIÓN -->
-    <form id="eval-form" class="hidden" onsubmit="enviarEvaluacion(event)">
+    <form id="eval-form" class="hidden no-print" onsubmit="enviarEvaluacion(event)">
         <div id="athlete-info" class="alert alert-success" style="font-weight: bold;"></div>
 
         <!-- PROTOCOLO MENTAL -->
@@ -150,38 +193,17 @@
             <h3>1. Protocolo Mental (5 Pilares)</h3>
             <p style="font-size: 0.82rem; color: #666;">Califica de 0 a 10 tu nivel de dominio ante la presión o el error:</p>
             
-            <div class="slider-container">
-                <label>1. Identificación de Emociones</label>
-                <input type="range" min="0" max="10" value="5" id="p1" oninput="updateVal('p1', 'v1')">
-                <span id="v1" class="slider-val">5</span>
-            </div>
-            <div class="slider-container">
-                <label>2. Respiro para Conciencia</label>
-                <input type="range" min="0" max="10" value="5" id="p2" oninput="updateVal('p2', 'v2')">
-                <span id="v2" class="slider-val">5</span>
-            </div>
-            <div class="slider-container">
-                <label>3. Auto-diálogo Constructivo</label>
-                <input type="range" min="0" max="10" value="5" id="p3" oninput="updateVal('p3', 'v3')">
-                <span id="v3" class="slider-val">5</span>
-            </div>
-            <div class="slider-container">
-                <label>4. Visualización de Ejecución</label>
-                <input type="range" min="0" max="10" value="5" id="p4" oninput="updateVal('p4', 'v4')">
-                <span id="v4" class="slider-val">5</span>
-            </div>
-            <div class="slider-container">
-                <label>5. Agradecimiento y Disfrute</label>
-                <input type="range" min="0" max="10" value="5" id="p5" oninput="updateVal('p5', 'v5')">
-                <span id="v5" class="slider-val">5</span>
-            </div>
+            <div class="slider-container"><label>1. Identificación de Emociones</label><input type="range" min="0" max="10" value="5" id="p1" oninput="updateVal('p1', 'v1')"><span id="v1" class="slider-val">5</span></div>
+            <div class="slider-container"><label>2. Respiro para Conciencia</label><input type="range" min="0" max="10" value="5" id="p2" oninput="updateVal('p2', 'v2')"><span id="v2" class="slider-val">5</span></div>
+            <div class="slider-container"><label>3. Auto-diálogo Constructivo</label><input type="range" min="0" max="10" value="5" id="p3" oninput="updateVal('p3', 'v3')"><span id="v3" class="slider-val">5</span></div>
+            <div class="slider-container"><label>4. Visualización de Ejecución</label><input type="range" min="0" max="10" value="5" id="p4" oninput="updateVal('p4', 'v4')"><span id="v4" class="slider-val">5</span></div>
+            <div class="slider-container"><label>5. Agradecimiento y Disfrute</label><input type="range" min="0" max="10" value="5" id="p5" oninput="updateVal('p5', 'v5')"><span id="v5" class="slider-val">5</span></div>
         </div>
 
         <!-- SOPORTE ESTRUCTURAL -->
         <div class="section-box">
             <h3>2. Soporte Estructural Deportivo (13 Factores)</h3>
             <p style="font-size: 0.82rem; color: #666;">Valora del 0 al 10 el cumplimiento real de tus bases:</p>
-            
             <div id="structural-sliders"></div>
         </div>
 
@@ -194,22 +216,62 @@
             </div>
             <div class="form-group">
                 <label>Firma Digital del Atleta:</label>
-                <canvas id="sig-canvas"></canvas>
+                <canvas id="sig-canvas" style="border: 1px solid #ccc; background: #fff; border-radius: 6px; width: 100%; height: 150px; touch-action: none;"></canvas>
                 <button type="button" style="margin-top: 5px; font-size: 0.8rem; padding: 4px 8px;" onclick="limpiarFirma()">Borrar Firma</button>
             </div>
         </div>
 
         <button type="submit" id="btn-submit" class="btn">Enviar Radiografía Mental</button>
     </form>
+
+    <!-- PASO 3: FICHA DE REPORTE VISUAL (VISIBLE TRAS ENVIAR) -->
+    <div id="report-view" class="hidden">
+        <div class="alert alert-success">¡Evaluación procesada con éxito! Esta es tu Ficha de Reporte oficial.</div>
+        
+        <div class="section-box">
+            <h3 id="rep-nombre" style="text-align: left; margin-bottom: 5px;">Atleta</h3>
+            <div id="rep-equipo" style="font-size: 0.9rem; color: #555; margin-bottom: 15px;">Equipo / Disciplina</div>
+            
+            <div class="report-grid">
+                <div class="metric-card">
+                    <div style="font-size: 0.8rem; color: #666;">ÍNDICE IFMI</div>
+                    <div class="metric-value" id="rep-ifmi">0%</div>
+                </div>
+                <div class="metric-card">
+                    <div style="font-size: 0.8rem; color: #666;">ZONA DIAGNÓSTICA</div>
+                    <div class="metric-value" id="rep-zona" style="font-size: 1.1rem; margin-top: 5px;">Zona 1</div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <strong>Micro-objetivo asignado (Próximas 2 semanas):</strong>
+                <p id="rep-objetivo" style="background: #fff; padding: 10px; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;"></p>
+            </div>
+        </div>
+
+        <!-- GRÁFICA DE EVOLUCIÓN HISTÓRICA (SOPORTE MULTI-AÑOS) -->
+        <div class="section-box">
+            <h3>Tendencia Histórica de Rendimiento (Evolución Mensual / Anual)</h3>
+            <p style="font-size: 0.82rem; color: #666; text-align: center;">Visualiza el comportamiento de tu IFMI% a lo largo del tiempo de seguimiento.</p>
+            <div style="position: relative; height:250px; width:100%;">
+                <canvas id="historyChart"></canvas>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 10px;" class="no-print">
+            <button type="button" class="btn btn-print" onclick="window.print()">Imprimir / Guardar como PDF</button>
+            <button type="button" class="btn" onclick="location.reload()">Realizar Nueva Consulta</button>
+        </div>
+    </div>
 </div>
 
 <script>
-    // URL DE TU PUENTE DE APPS SCRIPT
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwQ7XxNVVB3YebU8uBv0QWj8tP5a52q0ZPkkbKu2-BwLzdNd51mhpWgio2cptnbMEJs/exec";
-
     let currentAthlete = {};
+    let historyChartInstance = null;
 
-    // Generar sliders estructurales automáticamente
+    document.getElementById("print-date").innerText = "Fecha: " + new Date().toLocaleDateString();
+
     const factoresEstrucutrales = [
         "1. Horas de sueño", "2. Nutrición e hidratación", "3. Asistencia y puntualidad", 
         "4. Obediencia en entrenamientos", "5. Buena actitud", "6. Dominio técnico", 
@@ -239,8 +301,10 @@
     let painting = false;
 
     function resizeCanvas() {
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
+        if(canvas) {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+        }
     }
     window.addEventListener("load", resizeCanvas);
 
@@ -251,45 +315,40 @@
         ctx.lineWidth = 2;
         ctx.lineCap = "round";
         ctx.strokeStyle = "#244777";
-
         const rect = canvas.getBoundingClientRect();
         let x = (e.clientX || e.touches[0].clientX) - rect.left;
         let y = (e.clientY || e.touches[0].clientY) - rect.top;
-
         ctx.lineTo(x, y);
         ctx.stroke();
         ctx.beginPath();
         ctx.moveTo(x, y);
     }
 
-    canvas.addEventListener("mousedown", startPosition);
-    canvas.addEventListener("mouseup", endPosition);
-    canvas.addEventListener("mousemove", draw);
-
-    canvas.addEventListener("touchstart", startPosition);
-    canvas.addEventListener("touchend", endPosition);
-    canvas.addEventListener("touchmove", draw);
+    if(canvas) {
+        canvas.addEventListener("mousedown", startPosition);
+        canvas.addEventListener("mouseup", endPosition);
+        canvas.addEventListener("mousemove", draw);
+        canvas.addEventListener("touchstart", startPosition);
+        canvas.addEventListener("touchend", endPosition);
+        canvas.addEventListener("touchmove", draw);
+    }
 
     function limpiarFirma() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
-    // Validación de Atleta contra el Google Sheet
+    // Validación de Atleta
     async function validarAtleta() {
         let id = document.getElementById("id_atleta").value.trim();
         let msgDiv = document.getElementById("auth-msg");
-
         if(!id) {
             msgDiv.innerHTML = `<div class="alert alert-error">Por favor ingresa un ID válido.</div>`;
             return;
         }
-
         msgDiv.innerHTML = "Verificando acceso...";
-
         try {
             let response = await fetch(`${WEB_APP_URL}?action=check_athlete&id=${id}`);
             let data = await response.json();
-
             if(data.exists) {
                 currentAthlete = { id: id, nombre: data.nombre, equipo: data.equipo };
                 document.getElementById("step-auth").classList.add("hidden");
@@ -303,11 +362,11 @@
         }
     }
 
-    // Envío de la Evaluación al Google Sheet
+    // Envío y Renderizado de Reporte Visual e Historial
     async function enviarEvaluacion(e) {
         e.preventDefault();
         let btn = document.getElementById("btn-submit");
-        btn.innerText = "Enviando registros...";
+        btn.innerText = "Procesando radiografía...";
         btn.disabled = true;
 
         let payload = {
@@ -319,7 +378,7 @@
             p4: document.getElementById("p4").value,
             p5: document.getElementById("p5").value,
             micro_objetivo: document.getElementById("micro_objetivo").value,
-            firma_url: canvas.toDataURL() // Guarda la firma en formato imagen base64 temporal
+            firma_url: canvas.toDataURL()
         };
 
         for(let i=1; i<=13; i++) {
@@ -334,10 +393,36 @@
             let result = await response.json();
 
             if(result.status === "success") {
-                alert("¡Radiografía Mental guardada con éxito en el Master System!");
-                location.reload();
+                // Ocultar formulario y mostrar Ficha de Reporte
+                document.getElementById("eval-form").classList.add("hidden");
+                document.getElementById("report-view").classList.remove("hidden");
+
+                document.getElementById("rep-nombre").innerText = currentAthlete.nombre;
+                document.getElementById("rep-equipo").innerText = "Disciplina / Equipo: " + currentAthlete.equipo;
+                document.getElementById("rep-objetivo").innerText = payload.micro_objetivo || "Sin micro-objetivo especificado.";
+
+                // Simular cálculo de IFMI y Zona para la vista inmediata
+                let mentalSum = parseInt(payload.p1) + parseInt(payload.p2) + parseInt(payload.p3) + parseInt(payload.p4) + parseInt(payload.p5);
+                let mentalPorc = (mentalSum / 50) * 100;
+                
+                let estrucSum = 0;
+                for(let i=1; i<=13; i++) estrucSum += parseInt(payload[`s${i}`]);
+                let estrucPorc = (estrucSum / 130) * 100;
+
+                let ifmi = ((mentalPorc + estrucPorc) / 2).toFixed(1);
+                document.getElementById("rep-ifmi").innerText = ifmi + "%";
+
+                let zonaTexto = "Zona 1 - Fortaleza Integrada";
+                if(mentalPorc >= 80 && estrucPorc < 80) zonaTexto = "Zona 2 - Fuga Estructural";
+                else if(mentalPorc < 80 && estrucPorc >= 80) zonaTexto = "Zona 3 - Déficit Autorregulación";
+                else if(mentalPorc < 80 && estrucPorc < 80) zonaTexto = "Zona 4 - Alerta Rendimiento";
+                document.getElementById("rep-zona").innerText = zonaTexto;
+
+                // Renderizar Gráfica Histórica (Soporte multimes / multi-año)
+                // Si el atleta tiene historial previo simulado o real, se puede cargar aquí.
+                renderHistoryChart([ifmi]); // Aquí se inyectan los puntos históricos de su seguimiento
             } else {
-                alert("Hubo un error al guardar: " + result.message);
+                alert("Error: " + result.message);
                 btn.innerText = "Enviar Radiografía Mental";
                 btn.disabled = false;
             }
@@ -347,8 +432,43 @@
             btn.disabled = false;
         }
     }
+
+    function renderHistoryChart(historicalData) {
+        const ctxChart = document.getElementById('historyChart').getContext('2d');
+        if (historyChartInstance) historyChartInstance.destroy();
+
+        // Etiquetas de ejemplo para seguimiento a largo plazo (Meses / Años)
+        const labels = historicalData.length > 1 ? 
+            ['Mes 1', 'Mes 2', 'Mes 3', 'Actual'] : 
+            ['Evaluación Actual'];
+
+        historyChartInstance = new Chart(ctxChart, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Índice IFMI (%)',
+                    data: historicalData,
+                    borderColor: '#244777',
+                    backgroundColor: 'rgba(36, 71, 119, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        min: 0,
+                        max: 100
+                    }
+                }
+            }
+        });
+    }
 </script>
 
 </body>
 </html>
-
