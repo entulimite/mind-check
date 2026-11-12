@@ -672,6 +672,12 @@
     }
 
    function renderRealCronologyChart(historyArray) {
+        // Blindaje: Si el servidor no manda un arreglo válido, salimos sin congelar nada
+        if (!Array.isArray(historyArray) || historyArray.length === 0) {
+            console.warn("No hay historial válido para graficar o el servidor respondió con error.");
+            return;
+        }
+
         const mesesNombres = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
         const ahora = new Date();
         const anioActual = ahora.getFullYear();
