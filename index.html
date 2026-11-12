@@ -671,14 +671,80 @@
         }
     }
 
-    function renderRealCronologyChart(historyArray) {
+   function renderRealCronologyChart(historyArray) {
         const mesesNombres = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-    const mesActual = mesesNombres[new Date().getMonth()];
-    const labels = historyArray.map(item => (item.month === "Actual" || !item.month) ? mesActual : item.month);
-        const dataM = historyArray.map(item => item.mental);
-        const dataE = historyArray.map(item => item.estruc);
-        const dataI = historyArray.map(item => item.ifmi);
+        const ahora = new Date();
+        const anioActual = ahora.getFullYear();
+        const mesActualStr = mesesNombres[ahora.getMonth()];
 
+        // 1. Estandarizar fechas/años de cada registro recibido
+        const registrosProcesados = historyArray.map(item => {
+            let anio = anioActual;
+            if (item.date) {
+                let d = new Date(item.date);
+                if (!isNaN(d.getFullYear())) anio = d.getFullYear();
+            } else if (item.year) {
+                anio = parseInt(item.year);
+            }
+
+            let etiquetaMes = (item.month === "Actual" || !item.month) ? mesActualStr : item.month;
+
+            return {
+                anio: anio,
+                mes: etiquetaMes,
+                mental: parseFloat(item.mental) || 0,
+                estruc: parseFloat(item.estruc) || 0,
+                ifmi: parseFloat(item.ifmi) || 0
+            };
+        });
+
+        // 2. Separar años anteriores vs año en curso
+        const aniosAnterioresMap = {};
+        const mesesAnioActual = [];
+
+        registrosProcesados.forEach(reg => {
+            if (reg.anio < anioActual) {
+                if (!aniosAnterioresMap[reg.anio]) {
+                    aniosAnterioresMap[reg.anio] = { sumM: 0, sumE: 0, sumI: 0, count: 0 };
+                }
+                aniosAnterioresMap[reg.anio].sumM += reg.mental;
+                aniosAnterioresMap[reg.anio].sumE += reg.estruc;
+                aniosAnterioresMap[reg.anio].sumI += reg.ifmi;
+                aniosAnterioresMap[reg.anio].count += 1;
+            } else {
+                mesesAnioActual.push(reg);
+            }
+        });
+
+        // 3. Tomar máximo los últimos 5 años anteriores ordenados cronológicamente
+        const aniosOrdenados = Object.keys(aniosAnterioresMap)
+            .map(Number)
+            .sort((a, b) => a - b)
+            .slice(-5);
+
+        const labels = [];
+        const dataM = [];
+        const dataE = [];
+        const dataI = [];
+
+        // Agregar los puntos anuales (Promedios de años anteriores)
+        aniosOrdenados.forEach(anio => {
+            const grupo = aniosAnterioresMap[anio];
+            labels.push(`Prom ${anio}`);
+            dataM.push((grupo.sumM / grupo.count).toFixed(1));
+            dataE.push((grupo.sumE / grupo.count).toFixed(1));
+            dataI.push((grupo.sumI / grupo.count).toFixed(1));
+        });
+
+        // Agregar los meses individuales del año en curso
+        mesesAnioActual.forEach(reg => {
+            labels.push(reg.mes);
+            dataM.push(reg.mental);
+            dataE.push(reg.estruc);
+            dataI.push(reg.ifmi);
+        });
+
+        // Destruir gráficas previas si existen
         if (chartMentalInst) chartMentalInst.destroy();
         if (chartEstrucInst) chartEstrucInst.destroy();
         if (chartIfmiInst) chartIfmiInst.destroy();
