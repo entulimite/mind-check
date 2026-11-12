@@ -672,7 +672,9 @@
     }
 
     function renderRealCronologyChart(historyArray) {
-        const labels = historyArray.map(item => item.month);
+        const mesesNombres = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const mesActual = mesesNombres[new Date().getMonth()];
+    const labels = historyArray.map(item => (item.month === "Actual" || !item.month) ? mesActual : item.month);
         const dataM = historyArray.map(item => item.mental);
         const dataE = historyArray.map(item => item.estruc);
         const dataI = historyArray.map(item => item.ifmi);
