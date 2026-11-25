@@ -277,7 +277,7 @@
         <div class="slider-container"><label>4. Visualización de Ejecución (Proyecto mentalmente la ejecución correcta)</label><input type="range" min="0" max="10" value="5" id="p4" oninput="updateVal('p4', 'v4')"><span id="v4" class="slider-val">5</span></div>
         <div class="slider-container"><label>5. Agradecimiento y Disfrute (Disfruto independientemente del resultado)</label><input type="range" min="0" max="10" value="5" id="p5" oninput="updateVal('p5', 'v5')"><span id="v5" class="slider-val">5</span></div>
 
-        <div class="ficha-section-title">2. Soporte Estructural Deportivo (13 Factores de Base)</div>
+        <div class="ficha-section-title">2. Soporte Estructural Deportivo (14 Factores de Base)</div>
         <div style="font-size: 0.82rem; color: #666; margin-bottom: 10px;">Valora del 0 al 10 el cumplimiento real de tus bases:</div>
         <div id="structural-sliders"></div>
 
@@ -339,7 +339,7 @@
             <tr><th>Pilar / Puntuación</th><th style="width: 15%; text-align:center;">Pts (0-10)</th></tr>
         </table>
 
-        <!-- DESGLOSE DETALLADO 2: SOPORTE ESTRUCTURAL (13 FACTORES) -->
+        <!-- DESGLOSE DETALLADO 2: SOPORTE ESTRUCTURAL (14 FACTORES) -->
         <div class="ficha-section-title">2. Soporte Estructural Deportivo (Detalle de Respuestas)</div>
         <table class="ficha-table" id="tabla-rep-estruc">
             <tr><th>Factor Estructural / Puntuación</th><th style="width: 15%; text-align:center;">Pts (0-10)</th></tr>
@@ -353,7 +353,7 @@
                 <div class="ficha-card-val" id="rep-mental-val">0%</div>
             </div>
             <div class="ficha-card">
-                <div class="ficha-card-label">2. Soporte Estructural (/130 pts)</div>
+                <div class="ficha-card-label">2. Soporte Estructural (/140 pts)</div>
                 <div class="ficha-card-val" id="rep-estruc-val">0%</div>
             </div>
             <div class="ficha-card" style="background: var(--accent);">
@@ -404,7 +404,7 @@
             <canvas id="chartMental"></canvas>
         </div>
 
-        <div style="font-size: 0.8rem; font-weight: bold; color: var(--primary); margin-bottom: 5px;">GRÁFICA 2: EVOLUCIÓN DE SOPORTE ESTRUCTURAL (0 a 130 pts / % Estructural)</div>
+        <div style="font-size: 0.8rem; font-weight: bold; color: var(--primary); margin-bottom: 5px;">GRÁFICA 2: EVOLUCIÓN DE SOPORTE ESTRUCTURAL (0 a 140 pts / % Estructural)</div>
         <div style="position: relative; height:150px; width:100%; margin-bottom: 15px;">
             <canvas id="chartEstruc"></canvas>
         </div>
@@ -445,15 +445,25 @@
         "5. Agradecimiento y Disfrute"
     ];
 
-    const factoresEstrucutrales = [
-        "1. Cumplo mis horas de sueño acorde a mi edad", "2. Alimentación apropiada", "3. Asistencia y puntualidad", 
-        "4. Obediencia entrenamientos", "5. Buena actitud", "6. Dominio del aspecto técnico", 
-        "7. Dominio del aspecto táctico", "8. Resistencia física", "9. Flexibilidad requerida", 
-        "10. Fuerza / potencia requerida", "11. Agilidad y reacción requerida", "12. Me Esfuerzo al 100%", "13. Disfrute siempre"
+    const factoresEstructurales = [
+        "1. Cumplo mis horas de sueño acorde a mi edad",
+        "2. Alimentación apropiada",
+        "3. Asistencia y puntualidad",
+        "4. Obediencia entrenamientos",
+        "5. Buena actitud",
+        "6. Dominio del aspecto técnico",
+        "7. Dominio del aspecto táctico",
+        "8. Resistencia física",
+        "9. Flexibilidad requerida",
+        "10. Fuerza / potencia requerida",
+        "11. Agilidad y reacción requerida",
+        "12. Me Esfuerzo al 100%",
+        "13. Disfrute siempre",
+        "14. Salud física al 100% (sin lesión ni dolor residual o crónico)"
     ];
 
     const structContainer = document.getElementById("structural-sliders");
-    factoresEstrucutrales.forEach((factor, index) => {
+    factoresEstructurales.forEach((factor, index) => {
         let num = index + 1;
         structContainer.innerHTML += `
             <div class="slider-container">
@@ -499,8 +509,11 @@
         if (!painting) return;
         ctx.lineWidth = 2; ctx.lineCap = "round"; ctx.strokeStyle = "#244777";
         const rect = canvas.getBoundingClientRect();
-        let x = (e.clientX || e.touches[0].clientX) - rect.left;
-        let y = (e.clientY || e.touches[0].clientY) - rect.top;
+        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+        if (clientX === undefined || clientY === undefined) return;
+        let x = clientX - rect.left;
+        let y = clientY - rect.top;
         ctx.lineTo(x, y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x, y);
     }
 
@@ -508,9 +521,9 @@
         canvas.addEventListener("mousedown", startPosition);
         canvas.addEventListener("mouseup", endPosition);
         canvas.addEventListener("mousemove", draw);
-        canvas.addEventListener("touchstart", startPosition);
+        canvas.addEventListener("touchstart", startPosition, { passive: true });
         canvas.addEventListener("touchend", endPosition);
-        canvas.addEventListener("touchmove", draw);
+        canvas.addEventListener("touchmove", draw, { passive: true });
     }
 
     function limpiarFirma() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
@@ -537,7 +550,7 @@
                 document.getElementById("form-tipo-eval").innerText = `${tipoEvaluacionGlobal} | Mind-Check`;
                 document.getElementById("step-auth").classList.add("hidden");
                 document.getElementById("eval-form").classList.remove("hidden");
-                document.getElementById("athlete-info").innerText = `Atleta: ${data.nombre} | Equipo: ${data.equipo} (${tipoEvaluacionGlobal})`;
+                document.getElementById("athlete-info").innerText = `Atleta: ${data.nombre} | Equipo/Disciplina: ${data.equipo} (${tipoEvaluacionGlobal})`;
             } else {
                 msgDiv.innerHTML = `<div class="alert alert-error">Correo no encontrado o inactivo en la base de datos.</div>`;
             }
@@ -580,7 +593,7 @@
         let valoresMentalArr = [payload.p1, payload.p2, payload.p3, payload.p4, payload.p5];
         let valoresEstrucArr = [];
 
-        for(let i=1; i<=13; i++) { 
+        for(let i = 1; i <= 14; i++) { 
             payload[`s${i}`] = document.getElementById(`s${i}`).value; 
             valoresEstrucArr.push(payload[`s${i}`]);
         }
@@ -608,7 +621,7 @@
                 document.getElementById("tabla-rep-mental").innerHTML = tablaMentalHtml;
 
                 let tablaEstrucHtml = `<tr><th>Factor Estructural / Puntuación</th><th style="text-align:center;">Pts (0-10)</th></tr>`;
-                factoresEstrucutrales.forEach((nombre, idx) => {
+                factoresEstructurales.forEach((nombre, idx) => {
                     let val = valoresEstrucArr[idx];
                     let claseSemaforo = obtenerClaseSemaforo(val);
                     tablaEstrucHtml += `<tr><td>${nombre}</td><td style="text-align:center;font-weight:bold;" class="${claseSemaforo}">${val}</td></tr>`;
@@ -619,12 +632,12 @@
                 let mentalPorc = ((mentalSum / 50) * 100).toFixed(1);
                 
                 let estrucSum = valoresEstrucArr.reduce((a, b) => parseInt(a) + parseInt(b), 0);
-                let estrucPorc = ((estrucSum / 130) * 100).toFixed(1);
+                let estrucPorc = ((estrucSum / 140) * 100).toFixed(1);
 
                 let ifmi = ((parseFloat(mentalPorc) + parseFloat(estrucPorc)) / 2).toFixed(1);
 
                 document.getElementById("rep-mental-val").innerText = mentalPorc + "% (" + mentalSum + "/50)";
-                document.getElementById("rep-estruc-val").innerText = estrucPorc + "% (" + estrucSum + "/130)";
+                document.getElementById("rep-estruc-val").innerText = estrucPorc + "% (" + estrucSum + "/140)";
                 document.getElementById("rep-ifmi").innerText = ifmi + "%";
 
                 let zonaTitulo = "", zonaDesc = "", zonaEstrategia = "";
@@ -635,8 +648,8 @@
                     zonaEstrategia = "Afinación fina, liderazgo, simulación de escenarios de máxima presión y consolidación de hábitos. (Planificar cargas de trabajo)";
                 } else if(mentalPorc >= 80 && estrucPorc < 80) {
                     zonaTitulo = "ZONA 2: FUGA ESTRUCTURAL";
-                    zonaDesc = "Mente entrenada, pero el rendimiento disminuye por fallas en la estructura deportiva entorno o físico (sueño, nutrición, descanso, etc.).";
-                    zonaEstrategia = "Padres/entrenadores: El problema no es la mente, sino la falta de soporte y descanso. Ajustar la micro-rutina diaria.";
+                    zonaDesc = "Mente entrenada, pero el rendimiento disminuye por fallas en la estructura deportiva entorno o físico (sueño, nutrición, descanso, salud física, etc.).";
+                    zonaEstrategia = "Padres/entrenadores: El problema no es la mente, sino la falta de soporte, descanso o recuperación física. Ajustar la micro-rutina diaria.";
                 } else if(mentalPorc < 80 && estrucPorc >= 80) {
                     zonaTitulo = "ZONA 3: DÉFICIT AUTORREGULACIÓN";
                     zonaDesc = "Cumple con la estructura de soporte, pero carece de constancia en sus 5 rituales mentales diarios (Protocolo mental).";
@@ -671,7 +684,7 @@
         }
     }
 
-  function renderRealCronologyChart(historyArray) {
+    function renderRealCronologyChart(historyArray) {
         if (!historyArray || !Array.isArray(historyArray) || historyArray.length === 0) {
             return;
         }
@@ -684,7 +697,6 @@
         const aniosAnterioresMap = {};
         const mesesAnioActual = [];
 
-        // Procesamiento rápido y limpio sin bucles pesados
         historyArray.forEach(item => {
             let anio = item.year ? parseInt(item.year) : anioActual;
             let mes = (item.month === "Actual" || !item.month) ? mesActualStr : item.month;
@@ -706,7 +718,6 @@
             }
         });
 
-        // Tomar los últimos 5 años anteriores ordenados
         const aniosOrdenados = Object.keys(aniosAnterioresMap)
             .map(Number)
             .sort((a, b) => a - b)
@@ -717,7 +728,6 @@
         const dataE = [];
         const dataI = [];
 
-        // Rellenar años anteriores (Promedios)
         aniosOrdenados.forEach(anio => {
             const g = aniosAnterioresMap[anio];
             labels.push(`Prom ${anio}`);
@@ -726,7 +736,6 @@
             dataI.push((g.sumI / g.count).toFixed(1));
         });
 
-        // Rellenar meses del año actual
         mesesAnioActual.forEach(reg => {
             labels.push(reg.mes);
             dataM.push(reg.mental);
