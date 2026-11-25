@@ -166,6 +166,26 @@
         .semaforo-amarillo { background-color: #fffde7 !important; color: #f57f17; }
         .semaforo-rojo { background-color: #ffebee !important; color: #c62828; }
 
+        /* Contraste Perfil Prime vs Fuera de Perfil Prime */
+        .prime-ok {
+            background-color: #e6f4ea !important;
+            color: #137333 !important;
+            border-color: #81c995 !important;
+            font-weight: 700;
+        }
+        .prime-brecha {
+            background-color: #fce8e6 !important;
+            color: #c5221f !important;
+            border-color: #f6aea9 !important;
+            font-weight: 700;
+        }
+        .prime-parcial {
+            background-color: #fef7e0 !important;
+            color: #b06000 !important;
+            border-color: #fdd663 !important;
+            font-weight: 700;
+        }
+
         /* Estilos Oficiales Formato @EnTuLímite */
         .ficha-header {
             display: flex;
@@ -474,7 +494,7 @@
                 <th>Pilar Mental</th>
                 <th style="width: 15%; text-align:center;">Mejor Versión</th>
                 <th style="width: 17%; text-align:center;">Momento Difícil / Error</th>
-                <th style="width: 18%; text-align:center;">Distancia a Ideal (10)</th>
+                <th style="width: 20%; text-align:center;">Perfil Prime (10)</th>
             </tr>
         </table>
 
@@ -489,13 +509,13 @@
         <!-- BRECHA CUANTITATIVA RESPECTO AL PERFIL IDEAL + RADAR -->
         <div class="ficha-section-title">3. Distancia Cuantitativa al Perfil Ideal & Radar Mental</div>
         <div class="ficha-grid-2">
-            <div class="ficha-card">
+            <div class="ficha-card" id="card-ideal-best">
                 <div class="ficha-card-label">Perfil Ideal: Mejor Versión (Meta 50/50 = 100%)</div>
                 <div class="ficha-card-val" id="rep-ideal-best">0%</div>
                 <div class="ficha-card-sub" id="rep-brecha-best">--</div>
             </div>
-            <div class="ficha-card" style="background: var(--accent);">
-                <div class="ficha-card-label" style="color: var(--primary);">Perfil Ideal: Momento Difícil / Error (Meta 50/50 = 100%)</div>
+            <div class="ficha-card" id="card-ideal-hard">
+                <div class="ficha-card-label">Perfil Ideal: Momento Difícil / Error (Meta 50/50 = 100%)</div>
                 <div class="ficha-card-val" id="rep-ideal-hard">0%</div>
                 <div class="ficha-card-sub" id="rep-brecha-hard">--</div>
             </div>
@@ -675,8 +695,8 @@
         document.getElementById(`vm_hard_${id}`).innerText = hard;
         const distBest = (best - 10).toFixed(1);
         const distHard = (hard - 10).toFixed(1);
-        document.getElementById(`p_dist_best_${id}`).innerText = distBest === "0.0" ? "0.0 (Ideal)" : distBest;
-        document.getElementById(`p_dist_hard_${id}`).innerText = distHard === "0.0" ? "0.0 (Ideal)" : distHard;
+        document.getElementById(`p_dist_best_${id}`).innerText = distBest === "0.0" ? "0.0 (Prime)" : distBest;
+        document.getElementById(`p_dist_hard_${id}`).innerText = distHard === "0.0" ? "0.0 (Prime)" : distHard;
     }
 
     const factoresEstructurales = [
@@ -724,11 +744,37 @@
 
         const secEstructuralForm = document.getElementById("seccion-estructural-form");
         if (secEstructuralForm) {
-            if (esEvolucion) {
-                secEstructuralForm.classList.add("hidden");
-            } else {
-                secEstructuralForm.classList.remove("hidden");
-            }
+            secEstructuralForm.classList.toggle("hidden", esEvolucion);
+        }
+    }
+
+    function obtenerClasePrimeValor(val) {
+        if (val === 10) return "prime-ok";
+        if (val >= 7) return "prime-parcial";
+        return "prime-brecha";
+    }
+
+    function aplicarContrasteTarjetaPrime(cardId, valId, subId, suma, pct) {
+        const card = document.getElementById(cardId);
+        const valEl = document.getElementById(valId);
+        const subEl = document.getElementById(subId);
+        card.classList.remove("prime-ok", "prime-parcial", "prime-brecha");
+
+        const brechaPts = (suma - 50).toFixed(1);
+        const brechaPct = (parseFloat(pct) - 100).toFixed(1);
+
+        if (suma === 50) {
+            card.classList.add("prime-ok");
+            valEl.style.color = "#137333";
+            subEl.innerText = "PERFIL PRIME (0.0 pts de distancia)";
+        } else if (parseFloat(pct) >= 80) {
+            card.classList.add("prime-parcial");
+            valEl.style.color = "#b06000";
+            subEl.innerText = `Fuera de Prime · Distancia: ${brechaPts} pts (${brechaPct}%)`;
+        } else {
+            card.classList.add("prime-brecha");
+            valEl.style.color = "#c5221f";
+            subEl.innerText = `Lejos de Prime · Distancia: ${brechaPts} pts (${brechaPct}%)`;
         }
     }
 
@@ -822,10 +868,10 @@
                 labels: labels,
                 datasets: [
                     {
-                        label: "Perfil Ideal (10)",
+                        label: "Perfil Prime (10)",
                         data: dataIdeal,
-                        borderColor: "#2e7d32",
-                        backgroundColor: "rgba(46, 125, 50, 0.06)",
+                        borderColor: "#137333",
+                        backgroundColor: "rgba(19, 115, 51, 0.08)",
                         borderWidth: 2,
                         borderDash: [5, 5],
                         pointRadius: 2
@@ -841,10 +887,10 @@
                     {
                         label: "Momento Difícil / Error",
                         data: dataHard,
-                        borderColor: "#c62828",
-                        backgroundColor: "rgba(198, 40, 40, 0.14)",
+                        borderColor: "#c5221f",
+                        backgroundColor: "rgba(197, 34, 31, 0.16)",
                         borderWidth: 2,
-                        pointBackgroundColor: "#c62828"
+                        pointBackgroundColor: "#c5221f"
                     }
                 ]
             },
@@ -974,7 +1020,7 @@
                         <th>Pilar Mental</th>
                         <th style="width: 15%; text-align:center;">Mejor Versión</th>
                         <th style="width: 17%; text-align:center;">Momento Difícil / Error</th>
-                        <th style="width: 18%; text-align:center;">Distancia a Ideal (10)</th>
+                        <th style="width: 22%; text-align:center;">Perfil Prime (10)</th>
                     </tr>`;
 
                 let bestSum = 0;
@@ -988,35 +1034,32 @@
                     const distBest = (item.mejorVersion - 10).toFixed(1);
                     const distHard = (item.momentoDificil - 10).toFixed(1);
 
+                    const badgeBest = item.mejorVersion === 10
+                        ? `<span class="prime-ok" style="padding:1px 5px;border-radius:4px;">Prime</span>`
+                        : `<span class="${obtenerClasePrimeValor(item.mejorVersion)}" style="padding:1px 5px;border-radius:4px;">${distBest}</span>`;
+
+                    const badgeHard = item.momentoDificil === 10
+                        ? `<span class="prime-ok" style="padding:1px 5px;border-radius:4px;">Prime</span>`
+                        : `<span class="${obtenerClasePrimeValor(item.momentoDificil)}" style="padding:1px 5px;border-radius:4px;">${distHard}</span>`;
+
                     tablaMentalHtml += `
                         <tr>
                             <td>${item.nombre}</td>
                             <td style="text-align:center;font-weight:bold;" class="${claseBest}">${item.mejorVersion}</td>
                             <td style="text-align:center;font-weight:bold;" class="${claseHard}">${item.momentoDificil}</td>
-                            <td style="text-align:center;font-size:0.8rem;">MV: <strong>${distBest}</strong> | MD: <strong>${distHard}</strong></td>
+                            <td style="text-align:center;font-size:0.78rem;">MV: ${badgeBest} · MD: ${badgeHard}</td>
                         </tr>`;
                 });
                 document.getElementById("tabla-rep-mental").innerHTML = tablaMentalHtml;
 
-                // Cuantificación de distancia/cercanía respecto al perfil ideal (50 pts = 100%)
                 const pctBest = ((bestSum / 50) * 100).toFixed(1);
                 const pctHard = ((hardSum / 50) * 100).toFixed(1);
-                const brechaPtsBest = (bestSum - 50).toFixed(1);
-                const brechaPtsHard = (hardSum - 50).toFixed(1);
-                const brechaPctBest = (parseFloat(pctBest) - 100).toFixed(1);
-                const brechaPctHard = (parseFloat(pctHard) - 100).toFixed(1);
 
                 document.getElementById("rep-ideal-best").innerText = `${pctBest}% (${bestSum}/50 pts)`;
-                document.getElementById("rep-brecha-best").innerText =
-                    bestSum === 50
-                        ? "En perfil ideal (0.0 pts de distancia)"
-                        : `Distancia al ideal: ${brechaPtsBest} pts (${brechaPctBest}%)`;
-
                 document.getElementById("rep-ideal-hard").innerText = `${pctHard}% (${hardSum}/50 pts)`;
-                document.getElementById("rep-brecha-hard").innerText =
-                    hardSum === 50
-                        ? "En perfil ideal (0.0 pts de distancia)"
-                        : `Distancia al ideal: ${brechaPtsHard} pts (${brechaPctHard}%)`;
+
+                aplicarContrasteTarjetaPrime("card-ideal-best", "rep-ideal-best", "rep-brecha-best", bestSum, pctBest);
+                aplicarContrasteTarjetaPrime("card-ideal-hard", "rep-ideal-hard", "rep-brecha-hard", hardSum, pctHard);
 
                 renderRadarChart(detalleMental);
 
