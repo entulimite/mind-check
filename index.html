@@ -551,7 +551,7 @@
             </div>
 
             <div class="progreso-box" id="progreso-evolucion-box">
-                <strong>Seguimiento de Mejora en el Tiempo:</strong> <span id="texto-progreso-evol">Primer registro de evolución capturado. Al realizar futuras evoluciones aquí verás el cambio frente a tu registro anterior y en la Gráfica 1 verás toda tu trayectoria.</span>
+                <strong>Seguimiento de Mejora en el Tiempo:</strong> <span id="texto-progreso-evol">Primer registro de evolución capturado.</span>
             </div>
 
             <div class="radar-wrapper">
@@ -595,8 +595,8 @@
             </div>
         </div>
 
-        <div style="font-size: 0.8rem; font-weight: bold; color: var(--primary); margin-bottom: 5px;">GRÁFICA 1: EVOLUCIÓN DE PROTOCOLO MENTAL (0 a 50 pts / % Mental)</div>
-        <div style="position: relative; height:170px; width:100%; margin-bottom: 18px;">
+        <div style="font-size: 0.8rem; font-weight: bold; color: var(--primary); margin-bottom: 5px;" id="titulo-grafica-mental">GRÁFICA 1: EVOLUCIÓN DE PROTOCOLO MENTAL (0 a 100%)</div>
+        <div style="position: relative; height:190px; width:100%; margin-bottom: 18px;">
             <canvas id="chartMental"></canvas>
         </div>
 
@@ -667,41 +667,42 @@
     ];
 
     const pilaresMentalesEvol = [
-        {
-            id: 1,
-            nombre: "1. Identificación de Emociones",
-            corto: "Identificación Emociones",
-            detalle: "Reconozco con claridad la emoción sin desbordarme"
-        },
-        {
-            id: 2,
-            nombre: "2. Respiro para Conciencia",
-            corto: "Respiro Conciencia",
-            detalle: "Utilizo respiración para regresar al presente"
-        },
-        {
-            id: 3,
-            nombre: "3. Auto-diálogo Constructivo",
-            corto: "Auto-diálogo",
-            detalle: "Genero palabras internas de solución e instrucción"
-        },
-        {
-            id: 4,
-            nombre: "4. Visualización de Ejecución",
-            corto: "Visualización",
-            detalle: "Proyecto mentalmente la ejecución correcta"
-        },
-        {
-            id: 5,
-            nombre: "5. Agradecimiento y Disfrute",
-            corto: "Agradecimiento y Disfrute",
-            detalle: "Disfruto independientemente del resultado"
-        }
+        { id: 1, nombre: "1. Identificación de Emociones", corto: "Identificación Emociones", detalle: "Reconozco con claridad la emoción sin desbordarme" },
+        { id: 2, nombre: "2. Respiro para Conciencia", corto: "Respiro Conciencia", detalle: "Utilizo respiración para regresar al presente" },
+        { id: 3, nombre: "3. Auto-diálogo Constructivo", corto: "Auto-diálogo", detalle: "Genero palabras internas de solución e instrucción" },
+        { id: 4, nombre: "4. Visualización de Ejecución", corto: "Visualización", detalle: "Proyecto mentalmente la ejecución correcta" },
+        { id: 5, nombre: "5. Agradecimiento y Disfrute", corto: "Agradecimiento y Disfrute", detalle: "Disfruto independientemente del resultado" }
     ];
 
     function claveMejorVersionAtleta() {
         const id = (currentAthlete && currentAthlete.id) ? String(currentAthlete.id).trim().toLowerCase() : "default";
         return `entulimite_mv_${id}`;
+    }
+
+    function claveHistorialLocalAtleta() {
+        const id = (currentAthlete && currentAthlete.id) ? String(currentAthlete.id).trim().toLowerCase() : "default";
+        return `entulimite_hist_${id}`;
+    }
+
+    function obtenerHistorialLocal() {
+        try {
+            const raw = localStorage.getItem(claveHistorialLocalAtleta());
+            const arr = raw ? JSON.parse(raw) : [];
+            return Array.isArray(arr) ? arr : [];
+        } catch (err) {
+            return [];
+        }
+    }
+
+    function guardarRegistroEnHistorialLocal(registro) {
+        try {
+            const arr = obtenerHistorialLocal();
+            arr.push(registro);
+            localStorage.setItem(claveHistorialLocalAtleta(), JSON.stringify(arr.slice(-30)));
+            return arr;
+        } catch (err) {
+            return [registro];
+        }
     }
 
     function obtenerMejorVersionGuardada(serverData) {
@@ -1019,7 +1020,7 @@
         }
 
         const delta = parseFloat((parseFloat(mentalPorcActual) - prevMental).toFixed(1));
-        const etiquetaPrev = previo.month || "registro anterior";
+        const etiquetaPrev = previo.label || previo.month || "registro anterior";
         if (delta > 0) {
             elTexto.innerHTML = `Subiste <strong>+${delta} puntos porcentuales</strong> respecto a tu registro anterior (${etiquetaPrev}: ${prevMental}% → actual: ${mentalPorcActual}%).`;
         } else if (delta < 0) {
@@ -1149,6 +1150,9 @@
                 const bloqueGraficaEstruc = document.getElementById("bloque-grafica-estruc");
 
                 let mentalPorc = 0;
+                let estrucPorcActual = 0;
+                let pctBestActual = null;
+                let pctHardActual = null;
 
                 if (!esEvolucion) {
                     document.getElementById("rep-titulo-mental").innerText = "1. Protocolo Mental (Detalle de Respuestas)";
@@ -1161,7 +1165,7 @@
                     document.getElementById("tabla-rep-mental").innerHTML = tablaMentalHtml;
 
                     const mentalSum = valoresMentalEvalArr.reduce((a, b) => a + b, 0);
-                    mentalPorc = ((mentalSum / 50) * 100).toFixed(1);
+                    mentalPorc = parseFloat(((mentalSum / 50) * 100).toFixed(1));
 
                     bloqueRepEstruc.classList.remove("hidden");
                     bloqueEvolPrime.classList.add("hidden");
@@ -1177,14 +1181,14 @@
                     document.getElementById("tabla-rep-estruc").innerHTML = tablaEstrucHtml;
 
                     const estrucSum = valoresEstrucArr.reduce((a, b) => a + b, 0);
-                    const estrucPorc = ((estrucSum / 140) * 100).toFixed(1);
+                    estrucPorcActual = parseFloat(((estrucSum / 140) * 100).toFixed(1));
 
                     let zonaActivaId = "ZONA_4";
-                    if (parseFloat(mentalPorc) >= 80 && parseFloat(estrucPorc) >= 80) {
+                    if (mentalPorc >= 80 && estrucPorcActual >= 80) {
                         zonaActivaId = "ZONA_1";
-                    } else if (parseFloat(mentalPorc) >= 80 && parseFloat(estrucPorc) < 80) {
+                    } else if (mentalPorc >= 80 && estrucPorcActual < 80) {
                         zonaActivaId = "ZONA_2";
-                    } else if (parseFloat(mentalPorc) < 80 && parseFloat(estrucPorc) >= 80) {
+                    } else if (mentalPorc < 80 && estrucPorcActual >= 80) {
                         zonaActivaId = "ZONA_3";
                     } else {
                         zonaActivaId = "ZONA_4";
@@ -1224,13 +1228,13 @@
                     });
                     document.getElementById("tabla-rep-mental").innerHTML = tablaMentalHtml;
 
-                    const pctBest = ((bestSum / 50) * 100).toFixed(1);
-                    const pctHard = ((hardSum / 50) * 100).toFixed(1);
+                    pctBestActual = parseFloat(((bestSum / 50) * 100).toFixed(1));
+                    pctHardActual = parseFloat(((hardSum / 50) * 100).toFixed(1));
                     const diffTotalPts = parseFloat((hardSum - bestSum).toFixed(1));
                     const diffTotalPct = ((diffTotalPts / 50) * 100).toFixed(1);
                     const brechaPrimeBest = (bestSum - 50).toFixed(1);
 
-                    document.getElementById("rep-val-best").innerText = `${pctBest}% (${bestSum}/50 pts)`;
+                    document.getElementById("rep-val-best").innerText = `${pctBestActual}% (${bestSum}/50 pts)`;
                     document.getElementById("rep-sub-best").innerText =
                         bestSum === 50 ? "En techo Prime (10/10)" : `Ref. Prime (10): ${brechaPrimeBest} pts`;
 
@@ -1239,7 +1243,7 @@
                     cardBest.classList.add("mv-sostenido");
                     document.getElementById("rep-val-best").style.color = "#244777";
 
-                    document.getElementById("rep-val-hard").innerText = `${pctHard}% (${hardSum}/50 pts)`;
+                    document.getElementById("rep-val-hard").innerText = `${pctHardActual}% (${hardSum}/50 pts)`;
                     const cardHard = document.getElementById("card-vs-mejor");
                     const valHardEl = document.getElementById("rep-val-hard");
                     const subHardEl = document.getElementById("rep-sub-hard");
@@ -1264,7 +1268,7 @@
                     renderRadarChart(detalleMentalEvol);
 
                     const mentalSum = detalleMentalEvol.reduce((acc, item) => acc + item.promedio, 0);
-                    mentalPorc = ((mentalSum / 50) * 100).toFixed(1);
+                    mentalPorc = parseFloat(((mentalSum / 50) * 100).toFixed(1));
 
                     bloqueRepEstruc.classList.add("hidden");
                     bloqueEvolPrime.classList.remove("hidden");
@@ -1272,11 +1276,41 @@
                     bloqueGraficaEstruc.classList.add("hidden");
                 }
 
-                let historialFinal = result.history;
-                if (!historialFinal || historialFinal.length === 0) {
-                    const mesesNombres = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-                    let mesActualStr = mesesNombres[new Date().getMonth()];
-                    historialFinal = [{month: mesActualStr, mental: mentalPorc, estruc: 0}];
+                const mesesNombres = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+                const ahora = new Date();
+                const mesActualStr = mesesNombres[ahora.getMonth()];
+                const horaMinStr = `${String(ahora.getHours()).padStart(2,'0')}:${String(ahora.getMinutes()).padStart(2,'0')}`;
+
+                const registroActual = {
+                    year: ahora.getFullYear(),
+                    month: mesActualStr,
+                    label: `${tipoEvaluacionGlobal === "Evolución" ? "Evol" : "Eval"} (${mesActualStr} ${horaMinStr})`,
+                    tipo: tipoEvaluacionGlobal,
+                    mental: mentalPorc,
+                    estruc: estrucPorcActual,
+                    bestPct: pctBestActual,
+                    hardPct: pctHardActual
+                };
+
+                const histLocal = guardarRegistroEnHistorialLocal(registroActual);
+
+                let historialFinal = [];
+                if (Array.isArray(result.history) && result.history.length > 0) {
+                    historialFinal = result.history.map((item, idx) => ({
+                        year: item.year || ahora.getFullYear(),
+                        month: item.month || mesActualStr,
+                        label: item.label || `#${idx + 1} (${item.month || mesActualStr})`,
+                        mental: parseFloat(item.mental) || 0,
+                        estruc: parseFloat(item.estruc) || 0,
+                        bestPct: item.bestPct !== undefined ? parseFloat(item.bestPct) : null,
+                        hardPct: item.hardPct !== undefined ? parseFloat(item.hardPct) : null
+                    }));
+                    // Si el servidor solo devolvió 1 registro pero en local ya hay más de este atleta, conservamos el historial local
+                    if (historialFinal.length === 1 && histLocal.length > 1) {
+                        historialFinal = histLocal;
+                    }
+                } else {
+                    historialFinal = histLocal;
                 }
 
                 if (esEvolucion) {
@@ -1301,54 +1335,9 @@
             return;
         }
 
-        const mesesNombres = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-        const ahora = new Date();
-        const anioActual = ahora.getFullYear();
-        const mesActualStr = mesesNombres[ahora.getMonth()];
-
-        const aniosAnterioresMap = {};
-        const mesesAnioActual = [];
-
-        historyArray.forEach(item => {
-            let anio = item.year ? parseInt(item.year) : anioActual;
-            let mes = (item.month === "Actual" || !item.month) ? mesActualStr : item.month;
-            
-            let mental = parseFloat(item.mental) || 0;
-            let estruc = parseFloat(item.estruc) || 0;
-
-            if (anio < anioActual) {
-                if (!aniosAnterioresMap[anio]) {
-                    aniosAnterioresMap[anio] = { sumM: 0, sumE: 0, count: 0 };
-                }
-                aniosAnterioresMap[anio].sumM += mental;
-                aniosAnterioresMap[anio].sumE += estruc;
-                aniosAnterioresMap[anio].count += 1;
-            } else {
-                mesesAnioActual.push({ mes, mental, estruc });
-            }
-        });
-
-        const aniosOrdenados = Object.keys(aniosAnterioresMap)
-            .map(Number)
-            .sort((a, b) => a - b)
-            .slice(-5);
-
-        const labels = [];
-        const dataM = [];
-        const dataE = [];
-
-        aniosOrdenados.forEach(anio => {
-            const g = aniosAnterioresMap[anio];
-            labels.push(`Prom ${anio}`);
-            dataM.push((g.sumM / g.count).toFixed(1));
-            dataE.push((g.sumE / g.count).toFixed(1));
-        });
-
-        mesesAnioActual.forEach(reg => {
-            labels.push(reg.mes);
-            dataM.push(reg.mental);
-            dataE.push(reg.estruc);
-        });
+        const labels = historyArray.map((item, idx) => item.label || item.month || `Reg ${idx + 1}`);
+        const dataM = historyArray.map(item => parseFloat(item.mental) || 0);
+        const dataE = historyArray.map(item => parseFloat(item.estruc) || 0);
 
         if (chartMentalInst) chartMentalInst.destroy();
         if (chartEstrucInst) chartEstrucInst.destroy();
@@ -1356,12 +1345,59 @@
         const commonOptions = {
             responsive: true,
             maintainAspectRatio: false,
-            scales: { y: { min: 0, max: 100 } }
+            scales: { y: { min: 0, max: 100 } },
+            plugins: {
+                legend: { position: "bottom", labels: { boxWidth: 12, font: { size: 11 } } }
+            }
         };
+
+        const datasetsMental = [
+            {
+                label: '% Promedio Mental',
+                data: dataM,
+                borderColor: '#244777',
+                backgroundColor: 'rgba(36, 71, 119, 0.12)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.2
+            }
+        ];
+
+        if (esEvolucion) {
+            document.getElementById("titulo-grafica-mental").innerText = "GRÁFICA 1: EVOLUCIÓN EN EL TIEMPO — MEJOR VERSIÓN VS. PEOR MOMENTO (%)";
+            const tieneBest = historyArray.some(i => i.bestPct !== null && i.bestPct !== undefined && !isNaN(parseFloat(i.bestPct)));
+            const tieneHard = historyArray.some(i => i.hardPct !== null && i.hardPct !== undefined && !isNaN(parseFloat(i.hardPct)));
+
+            if (tieneBest) {
+                datasetsMental.push({
+                    label: '% Mejor Versión',
+                    data: historyArray.map(i => i.bestPct !== null && i.bestPct !== undefined ? parseFloat(i.bestPct) : null),
+                    borderColor: '#137333',
+                    backgroundColor: 'transparent',
+                    borderWidth: 2,
+                    borderDash: [4, 4],
+                    tension: 0.2,
+                    spanGaps: true
+                });
+            }
+            if (tieneHard) {
+                datasetsMental.push({
+                    label: '% Peor Momento / Error',
+                    data: historyArray.map(i => i.hardPct !== null && i.hardPct !== undefined ? parseFloat(i.hardPct) : null),
+                    borderColor: '#c5221f',
+                    backgroundColor: 'transparent',
+                    borderWidth: 2,
+                    tension: 0.2,
+                    spanGaps: true
+                });
+            }
+        } else {
+            document.getElementById("titulo-grafica-mental").innerText = "GRÁFICA 1: EVOLUCIÓN DE PROTOCOLO MENTAL (0 a 50 pts / % Mental)";
+        }
 
         chartMentalInst = new Chart(document.getElementById('chartMental').getContext('2d'), {
             type: 'line',
-            data: { labels: labels, datasets: [{ label: '% Mental', data: dataM, borderColor: '#244777', backgroundColor: 'rgba(36, 71, 119, 0.1)', borderWidth: 2, fill: true, tension: 0.2, spanGaps: false }] },
+            data: { labels: labels, datasets: datasetsMental },
             options: commonOptions
         });
 
