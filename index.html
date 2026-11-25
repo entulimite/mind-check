@@ -166,23 +166,23 @@
         .semaforo-amarillo { background-color: #fffde7 !important; color: #f57f17; }
         .semaforo-rojo { background-color: #ffebee !important; color: #c62828; }
 
-        /* Contraste Perfil Prime vs Fuera de Perfil Prime */
-        .prime-ok {
+        /* Contraste Cercanía a Mejor Versión */
+        .mv-sostenido {
             background-color: #e6f4ea !important;
             color: #137333 !important;
             border-color: #81c995 !important;
             font-weight: 700;
         }
-        .prime-brecha {
-            background-color: #fce8e6 !important;
-            color: #c5221f !important;
-            border-color: #f6aea9 !important;
-            font-weight: 700;
-        }
-        .prime-parcial {
+        .mv-leve {
             background-color: #fef7e0 !important;
             color: #b06000 !important;
             border-color: #fdd663 !important;
+            font-weight: 700;
+        }
+        .mv-caida {
+            background-color: #fce8e6 !important;
+            color: #c5221f !important;
+            border-color: #f6aea9 !important;
             font-weight: 700;
         }
 
@@ -273,6 +273,15 @@
             color: #444;
             margin-top: 4px;
         }
+        .progreso-box {
+            background: #f0f4f8;
+            border: 1px solid #c5d1e0;
+            border-left: 5px solid var(--primary);
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 0.86rem;
+        }
         .radar-wrapper {
             background: #FAFAFC;
             border: 1px solid #d0d7de;
@@ -356,7 +365,7 @@
             padding-top: 5px;
             font-size: 0.8rem;
             color: #444;
-            min-height: 50px;
+            min-height: 55px;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
@@ -435,10 +444,10 @@
             <div class="slider-container"><label>5. Agradecimiento y Disfrute (Disfruto independientemente del resultado)</label><input type="range" min="0" max="10" value="5" id="p5" oninput="updateVal('p5', 'v5')"><span id="v5" class="slider-val">5</span></div>
         </div>
 
-        <!-- MODO EVOLUCIÓN (COMPARATIVA) -->
+        <!-- MODO EVOLUCIÓN (COMPARATIVA VS MEJOR VERSIÓN) -->
         <div id="mental-evol-mode" class="hidden">
             <div style="font-size: 0.82rem; color: #666; margin-bottom: 12px;">
-                Califica del 0 al 10 cada pilar en dos escenarios: <strong>En tu mejor versión</strong> vs. <strong>En tu momento más difícil / tras un error o presión</strong>.
+                Califica del 0 al 10 cada pilar en <strong>Tu mejor versión</strong> y en <strong>Tu peor momento / momento más difícil o error</strong>.
             </div>
             <div id="mental-sliders"></div>
         </div>
@@ -465,7 +474,7 @@
 
             <!-- Opción A: Canvas para dibujar -->
             <div id="contenedor-canvas">
-                <canvas id="sig-canvas" style="border: 1px solid #ccc; background: #fff; border-radius: 6px; width: 100%; height: 130px; touch-action: none;"></canvas>
+                <canvas id="sig-canvas" width="720" height="130" style="border: 1px solid #ccc; background: #fff; border-radius: 6px; width: 100%; height: 130px; touch-action: none;"></canvas>
                 <button type="button" style="margin-top: 5px; font-size: 0.8rem; padding: 4px 8px;" onclick="limpiarFirma()">Borrar Trazo</button>
             </div>
 
@@ -516,25 +525,29 @@
             </table>
         </div>
 
-        <!-- SECCIÓN EXCLUSIVA DE EVOLUCIÓN: DISTANCIA AL PERFIL PRIME + RADAR -->
+        <!-- SECCIÓN EXCLUSIVA DE EVOLUCIÓN: CERCANÍA A MEJOR VERSIÓN + PROGRESO + RADAR -->
         <div id="bloque-evolucion-prime" class="hidden">
-            <div class="ficha-section-title">2. Distancia Cuantitativa al Perfil Prime & Radar Mental</div>
+            <div class="ficha-section-title">2. Cercanía a tu Mejor Versión & Radar Mental (Ref. Prime: 10)</div>
             <div class="ficha-grid-2">
-                <div class="ficha-card" id="card-ideal-best">
-                    <div class="ficha-card-label">Perfil Prime: Mejor Versión (Meta 50/50 = 100%)</div>
-                    <div class="ficha-card-val" id="rep-ideal-best">0%</div>
-                    <div class="ficha-card-sub" id="rep-brecha-best">--</div>
+                <div class="ficha-card" id="card-mejor-version">
+                    <div class="ficha-card-label">Tu Mejor Versión (Ref. Prime 50/50 = 100%)</div>
+                    <div class="ficha-card-val" id="rep-val-best">0%</div>
+                    <div class="ficha-card-sub" id="rep-sub-best">--</div>
                 </div>
-                <div class="ficha-card" id="card-ideal-hard">
-                    <div class="ficha-card-label">Perfil Prime: Momento Difícil / Error (Meta 50/50 = 100%)</div>
-                    <div class="ficha-card-val" id="rep-ideal-hard">0%</div>
-                    <div class="ficha-card-sub" id="rep-brecha-hard">--</div>
+                <div class="ficha-card" id="card-vs-mejor">
+                    <div class="ficha-card-label">Peor Momento / Error vs. Tu Mejor Versión</div>
+                    <div class="ficha-card-val" id="rep-val-hard">0%</div>
+                    <div class="ficha-card-sub" id="rep-sub-hard">--</div>
                 </div>
+            </div>
+
+            <div class="progreso-box" id="progreso-evolucion-box">
+                <strong>Seguimiento de Mejora en el Tiempo:</strong> <span id="texto-progreso-evol">Primer registro de evolución capturado. Al realizar futuras evoluciones aquí verás el cambio frente a tu registro anterior y en la Gráfica 1 verás toda tu trayectoria.</span>
             </div>
 
             <div class="radar-wrapper">
                 <div style="font-size: 0.82rem; font-weight: bold; color: var(--primary); text-align: center; margin-bottom: 8px;">
-                    GRÁFICA RADAR: MEJOR VERSIÓN VS. MOMENTO DIFÍCIL / ERROR VS. PERFIL PRIME (0–10)
+                    GRÁFICA RADAR ACTUAL: MEJOR VERSIÓN VS. PEOR MOMENTO / ERROR (REF. PRIME 10)
                 </div>
                 <div class="radar-canvas-box">
                     <canvas id="chartRadar"></canvas>
@@ -566,7 +579,7 @@
         <div class="ficha-header" style="margin-top: 20px;">
             <div class="ficha-logo">
                 <h1>@EnTuLímite</h1>
-                <span>Seguimiento Gráfico Cronológico (Mes a Mes Real)</span>
+                <span>Seguimiento Gráfico Cronológico (Trayectoria Real)</span>
             </div>
             <div class="ficha-meta">
                 <span>Historial Longitudinal del Atleta</span>
@@ -606,6 +619,7 @@
     let currentAthlete = {};
     let tipoEvaluacionGlobal = "Evaluación";
     let modoFirmaActual = "draw";
+    let tieneTrazoFirma = false;
     let chartRadarInst = null, chartMentalInst = null, chartEstrucInst = null;
 
     const catalogoZonas = [
@@ -676,6 +690,20 @@
         }
     ];
 
+    function formatearDifMejorVersion(best, hard) {
+        const diff = parseFloat((hard - best).toFixed(1));
+        if (diff === 0) return "0.0 (Al nivel de tu mejor versión)";
+        if (diff > 0) return `+${diff.toFixed(1)} (Arriba de tu mejor versión)`;
+        return `${diff.toFixed(1)} vs tu mejor versión`;
+    }
+
+    function obtenerClaseVsMejorVersion(best, hard) {
+        const diff = hard - best;
+        if (diff >= 0) return "mv-sostenido";
+        if (diff >= -2) return "mv-leve";
+        return "mv-caida";
+    }
+
     const mentalContainer = document.getElementById("mental-sliders");
     pilaresMentalesEvol.forEach((p) => {
         mentalContainer.innerHTML += `
@@ -684,7 +712,7 @@
                 <div class="pilar-subgrid">
                     <div class="slider-box">
                         <div class="slider-top">
-                            <span>En tu mejor versión</span>
+                            <span>Tu mejor versión</span>
                             <span id="vm_best_${p.id}" class="slider-val">5</span>
                         </div>
                         <div class="slider-row">
@@ -693,7 +721,7 @@
                     </div>
                     <div class="slider-box">
                         <div class="slider-top">
-                            <span>En tu momento más difícil / error o presión</span>
+                            <span>Peor momento / momento difícil o error</span>
                             <span id="vm_hard_${p.id}" class="slider-val">5</span>
                         </div>
                         <div class="slider-row">
@@ -702,7 +730,7 @@
                     </div>
                 </div>
                 <div class="pilar-resumen">
-                    Distancia a Prime (10): <strong id="p_dist_best_${p.id}">-5.0</strong> en mejor versión | <strong id="p_dist_hard_${p.id}">-5.0</strong> en momento difícil/error
+                    Distancia a tu mejor versión: <strong id="p_dist_mv_${p.id}">0.0 (Al nivel de tu mejor versión)</strong>
                 </div>
             </div>
         `;
@@ -713,10 +741,7 @@
         const hard = parseInt(document.getElementById(`m_hard_${id}`).value) || 0;
         document.getElementById(`vm_best_${id}`).innerText = best;
         document.getElementById(`vm_hard_${id}`).innerText = hard;
-        const distBest = (best - 10).toFixed(1);
-        const distHard = (hard - 10).toFixed(1);
-        document.getElementById(`p_dist_best_${id}`).innerText = distBest === "0.0" ? "0.0 (Prime)" : distBest;
-        document.getElementById(`p_dist_hard_${id}`).innerText = distHard === "0.0" ? "0.0 (Prime)" : distHard;
+        document.getElementById(`p_dist_mv_${id}`).innerText = formatearDifMejorVersion(best, hard);
     }
 
     const factoresEstructurales = [
@@ -767,36 +792,6 @@
         document.getElementById("seccion-estructural-form").classList.toggle("hidden", esEvolucion);
     }
 
-    function obtenerClasePrimeValor(val) {
-        if (val === 10) return "prime-ok";
-        if (val >= 7) return "prime-parcial";
-        return "prime-brecha";
-    }
-
-    function aplicarContrasteTarjetaPrime(cardId, valId, subId, suma, pct) {
-        const card = document.getElementById(cardId);
-        const valEl = document.getElementById(valId);
-        const subEl = document.getElementById(subId);
-        card.classList.remove("prime-ok", "prime-parcial", "prime-brecha");
-
-        const brechaPts = (suma - 50).toFixed(1);
-        const brechaPct = (parseFloat(pct) - 100).toFixed(1);
-
-        if (suma === 50) {
-            card.classList.add("prime-ok");
-            valEl.style.color = "#137333";
-            subEl.innerText = "PERFIL PRIME (0.0 pts de distancia)";
-        } else if (parseFloat(pct) >= 80) {
-            card.classList.add("prime-parcial");
-            valEl.style.color = "#b06000";
-            subEl.innerText = `Fuera de Prime · Distancia: ${brechaPts} pts (${brechaPct}%)`;
-        } else {
-            card.classList.add("prime-brecha");
-            valEl.style.color = "#c5221f";
-            subEl.innerText = `Lejos de Prime · Distancia: ${brechaPts} pts (${brechaPct}%)`;
-        }
-    }
-
     function renderMatrizZonas(zonaActivaId) {
         const contenedor = document.getElementById("zonas-completas");
         contenedor.innerHTML = catalogoZonas.map(z => {
@@ -835,21 +830,38 @@
     let painting = false;
 
     function resizeCanvas() {
-        if(canvas) { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
+        if(!canvas) return;
+        const w = canvas.offsetWidth || 680;
+        const h = 130;
+        if (canvas.width !== w || canvas.height !== h) {
+            const snapshot = tieneTrazoFirma ? canvas.toDataURL() : null;
+            canvas.width = w;
+            canvas.height = h;
+            if (snapshot) {
+                const img = new Image();
+                img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                img.src = snapshot;
+            }
+        }
     }
     window.addEventListener("load", resizeCanvas);
 
-    function startPosition(e) { painting = true; draw(e); }
+    function startPosition(e) {
+        resizeCanvas();
+        painting = true;
+        tieneTrazoFirma = true;
+        draw(e);
+    }
     function endPosition() { painting = false; ctx.beginPath(); }
     function draw(e) {
         if (!painting) return;
-        ctx.lineWidth = 2; ctx.lineCap = "round"; ctx.strokeStyle = "#244777";
+        ctx.lineWidth = 2.2; ctx.lineCap = "round"; ctx.strokeStyle = "#244777";
         const rect = canvas.getBoundingClientRect();
-        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+        const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] && e.touches[0].clientX);
+        const clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0] && e.touches[0].clientY);
         if (clientX === undefined || clientY === undefined) return;
-        let x = clientX - rect.left;
-        let y = clientY - rect.top;
+        let x = (clientX - rect.left) * (canvas.width / (rect.width || 1));
+        let y = (clientY - rect.top) * (canvas.height / (rect.height || 1));
         ctx.lineTo(x, y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x, y);
     }
 
@@ -862,7 +874,10 @@
         canvas.addEventListener("touchmove", draw, { passive: true });
     }
 
-    function limpiarFirma() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+    function limpiarFirma() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        tieneTrazoFirma = false;
+    }
 
     function obtenerClaseSemaforo(valor) {
         let v = parseFloat(valor);
@@ -887,29 +902,29 @@
                 labels: labels,
                 datasets: [
                     {
-                        label: "Perfil Prime (10)",
-                        data: dataPrime,
-                        borderColor: "#137333",
-                        backgroundColor: "rgba(19, 115, 51, 0.08)",
-                        borderWidth: 2,
-                        borderDash: [5, 5],
-                        pointRadius: 2
-                    },
-                    {
                         label: "Mejor Versión",
                         data: dataBest,
                         borderColor: "#244777",
-                        backgroundColor: "rgba(36, 71, 119, 0.18)",
+                        backgroundColor: "rgba(36, 71, 119, 0.20)",
                         borderWidth: 2,
                         pointBackgroundColor: "#244777"
                     },
                     {
-                        label: "Momento Difícil / Error",
+                        label: "Peor Momento / Error",
                         data: dataHard,
                         borderColor: "#c5221f",
                         backgroundColor: "rgba(197, 34, 31, 0.16)",
                         borderWidth: 2,
                         pointBackgroundColor: "#c5221f"
+                    },
+                    {
+                        label: "Indicador Prime (10)",
+                        data: dataPrime,
+                        borderColor: "#137333",
+                        backgroundColor: "rgba(19, 115, 51, 0.05)",
+                        borderWidth: 1.5,
+                        borderDash: [5, 5],
+                        pointRadius: 2
                     }
                 ]
             },
@@ -940,6 +955,33 @@
         });
     }
 
+    function actualizarProgresoEvolucion(historyArray, mentalPorcActual) {
+        const elTexto = document.getElementById("texto-progreso-evol");
+        if (!elTexto) return;
+
+        if (!Array.isArray(historyArray) || historyArray.length < 2) {
+            elTexto.innerText = "Primer registro de evolución capturado. Al realizar futuras evoluciones aquí verás el cambio frente a tu registro anterior y en la Gráfica 1 verás toda tu trayectoria.";
+            return;
+        }
+
+        const previo = historyArray[historyArray.length - 2];
+        const prevMental = parseFloat(previo.mental);
+        if (isNaN(prevMental)) {
+            elTexto.innerText = "Historial longitudinal actualizado en la Gráfica 1.";
+            return;
+        }
+
+        const delta = parseFloat((parseFloat(mentalPorcActual) - prevMental).toFixed(1));
+        const etiquetaPrev = previo.month || "registro anterior";
+        if (delta > 0) {
+            elTexto.innerHTML = `Subiste <strong>+${delta} puntos porcentuales</strong> respecto a tu registro anterior (${etiquetaPrev}: ${prevMental}% → actual: ${mentalPorcActual}%).`;
+        } else if (delta < 0) {
+            elTexto.innerHTML = `Variación de <strong>${delta} puntos porcentuales</strong> respecto a tu registro anterior (${etiquetaPrev}: ${prevMental}% → actual: ${mentalPorcActual}%).`;
+        } else {
+            elTexto.innerHTML = `Mantuviste tu nivel (<strong>0.0 pts</strong> de cambio) respecto a tu registro anterior (${etiquetaPrev}: ${prevMental}%).`;
+        }
+    }
+
     async function validarAtleta() {
         let id = document.getElementById("id_atleta").value.trim();
         let msgDiv = document.getElementById("auth-msg");
@@ -956,6 +998,7 @@
                 document.getElementById("step-auth").classList.add("hidden");
                 document.getElementById("eval-form").classList.remove("hidden");
                 actualizarTipoRegistro();
+                setTimeout(resizeCanvas, 50);
             } else {
                 msgDiv.innerHTML = `<div class="alert alert-error">Correo no encontrado o inactivo en la base de datos.</div>`;
             }
@@ -977,12 +1020,17 @@
         let sigBoxAtleta = document.getElementById("sig-box-atleta");
         
         if (modoFirmaActual === 'draw') {
-            firmaFinal = canvas.toDataURL();
-            sigBoxAtleta.innerHTML = `<img src="${firmaFinal}" style="max-height: 45px; display: block; margin: 0 auto;"><span style="font-size:0.75rem;">Firma Atleta</span>`;
+            resizeCanvas();
+            firmaFinal = tieneTrazoFirma ? canvas.toDataURL("image/png") : "";
+            if (firmaFinal && firmaFinal.startsWith("data:image/")) {
+                sigBoxAtleta.innerHTML = `<img src="${firmaFinal}" alt="Firma del atleta" style="max-height: 46px; max-width: 100%; object-fit: contain; display: block; margin: 0 auto 2px auto;"><span style="font-size:0.75rem;">Firma Atleta</span>`;
+            } else {
+                sigBoxAtleta.innerHTML = `<span style="font-size:0.78rem; color:#777;">Sin trazo registrado</span><span style="font-size:0.75rem;">Firma Atleta</span>`;
+            }
         } else {
             let nombreEscrito = document.getElementById("sig-text-input").value.trim() || currentAthlete.nombre;
             firmaFinal = "Firma: " + nombreEscrito;
-            sigBoxAtleta.innerHTML = `<div style="font-family: 'Brush Script MT', cursive, sans-serif; font-size: 1.1rem; color: #244777;">${nombreEscrito}</div><span style="font-size:0.75rem;">Firma Atleta</span>`;
+            sigBoxAtleta.innerHTML = `<div style="font-family: 'Brush Script MT', cursive, sans-serif; font-size: 1.15rem; color: #244777;">${nombreEscrito}</div><span style="font-size:0.75rem;">Firma Atleta</span>`;
         }
 
         let payload = {
@@ -1052,7 +1100,6 @@
                 let mentalPorc = 0;
 
                 if (!esEvolucion) {
-                    // MODO EVALUACIÓN (NO COMPARATIVA)
                     document.getElementById("rep-titulo-mental").innerText = "1. Protocolo Mental (Detalle de Respuestas)";
                     let tablaMentalHtml = `<tr><th>Pilar / Puntuación</th><th style="width: 15%; text-align:center;">Pts (0-10)</th></tr>`;
                     nombresPilaresEval.forEach((nombre, idx) => {
@@ -1093,14 +1140,13 @@
                     }
                     renderMatrizZonas(zonaActivaId);
                 } else {
-                    // MODO EVOLUCIÓN (COMPARATIVA + PERFIL PRIME + RADAR)
-                    document.getElementById("rep-titulo-mental").innerText = "1. Protocolo Mental (Mejor Versión vs. Momento Difícil / Error)";
+                    document.getElementById("rep-titulo-mental").innerText = "1. Protocolo Mental (Mejor Versión vs. Peor Momento / Error)";
                     let tablaMentalHtml = `
                         <tr>
                             <th>Pilar Mental</th>
                             <th style="width: 15%; text-align:center;">Mejor Versión</th>
-                            <th style="width: 17%; text-align:center;">Momento Difícil / Error</th>
-                            <th style="width: 22%; text-align:center;">Perfil Prime (10)</th>
+                            <th style="width: 17%; text-align:center;">Peor Momento / Error</th>
+                            <th style="width: 24%; text-align:center;">Distancia a Mejor Versión</th>
                         </tr>`;
 
                     let bestSum = 0;
@@ -1111,35 +1157,58 @@
                         hardSum += item.momentoDificil;
                         const claseBest = obtenerClaseSemaforo(item.mejorVersion);
                         const claseHard = obtenerClaseSemaforo(item.momentoDificil);
-                        const distBest = (item.mejorVersion - 10).toFixed(1);
-                        const distHard = (item.momentoDificil - 10).toFixed(1);
-
-                        const badgeBest = item.mejorVersion === 10
-                            ? `<span class="prime-ok" style="padding:1px 5px;border-radius:4px;">Prime</span>`
-                            : `<span class="${obtenerClasePrimeValor(item.mejorVersion)}" style="padding:1px 5px;border-radius:4px;">${distBest}</span>`;
-
-                        const badgeHard = item.momentoDificil === 10
-                            ? `<span class="prime-ok" style="padding:1px 5px;border-radius:4px;">Prime</span>`
-                            : `<span class="${obtenerClasePrimeValor(item.momentoDificil)}" style="padding:1px 5px;border-radius:4px;">${distHard}</span>`;
+                        const diffPts = parseFloat((item.momentoDificil - item.mejorVersion).toFixed(1));
+                        const claseDiff = obtenerClaseVsMejorVersion(item.mejorVersion, item.momentoDificil);
+                        const textoDiff = diffPts === 0
+                            ? "0.0 (Igual a MV)"
+                            : (diffPts > 0 ? `+${diffPts.toFixed(1)} vs MV` : `${diffPts.toFixed(1)} vs MV`);
 
                         tablaMentalHtml += `
                             <tr>
                                 <td>${item.nombre}</td>
                                 <td style="text-align:center;font-weight:bold;" class="${claseBest}">${item.mejorVersion}</td>
                                 <td style="text-align:center;font-weight:bold;" class="${claseHard}">${item.momentoDificil}</td>
-                                <td style="text-align:center;font-size:0.78rem;">MV: ${badgeBest} · MD: ${badgeHard}</td>
+                                <td style="text-align:center;font-size:0.78rem;"><span class="${claseDiff}" style="padding:2px 6px;border-radius:4px;">${textoDiff}</span></td>
                             </tr>`;
                     });
                     document.getElementById("tabla-rep-mental").innerHTML = tablaMentalHtml;
 
                     const pctBest = ((bestSum / 50) * 100).toFixed(1);
                     const pctHard = ((hardSum / 50) * 100).toFixed(1);
+                    const diffTotalPts = parseFloat((hardSum - bestSum).toFixed(1));
+                    const diffTotalPct = ((diffTotalPts / 50) * 100).toFixed(1);
+                    const brechaPrimeBest = (bestSum - 50).toFixed(1);
 
-                    document.getElementById("rep-ideal-best").innerText = `${pctBest}% (${bestSum}/50 pts)`;
-                    document.getElementById("rep-ideal-hard").innerText = `${pctHard}% (${hardSum}/50 pts)`;
+                    document.getElementById("rep-val-best").innerText = `${pctBest}% (${bestSum}/50 pts)`;
+                    document.getElementById("rep-sub-best").innerText =
+                        bestSum === 50 ? "En techo Prime (10/10)" : `Ref. Prime (10): ${brechaPrimeBest} pts`;
 
-                    aplicarContrasteTarjetaPrime("card-ideal-best", "rep-ideal-best", "rep-brecha-best", bestSum, pctBest);
-                    aplicarContrasteTarjetaPrime("card-ideal-hard", "rep-ideal-hard", "rep-brecha-hard", hardSum, pctHard);
+                    const cardBest = document.getElementById("card-mejor-version");
+                    cardBest.classList.remove("mv-sostenido", "mv-leve", "mv-caida");
+                    cardBest.classList.add("mv-sostenido");
+                    document.getElementById("rep-val-best").style.color = "#244777";
+
+                    document.getElementById("rep-val-hard").innerText = `${pctHard}% (${hardSum}/50 pts)`;
+                    const cardHard = document.getElementById("card-vs-mejor");
+                    const valHardEl = document.getElementById("rep-val-hard");
+                    const subHardEl = document.getElementById("rep-sub-hard");
+                    cardHard.classList.remove("mv-sostenido", "mv-leve", "mv-caida");
+
+                    if (diffTotalPts >= 0) {
+                        cardHard.classList.add("mv-sostenido");
+                        valHardEl.style.color = "#137333";
+                        subHardEl.innerText = diffTotalPts === 0
+                            ? "Sostiene al 100% su Mejor Versión (0.0 pts)"
+                            : `Supera su Mejor Versión: +${diffTotalPts} pts (+${diffTotalPct}%)`;
+                    } else if (diffTotalPts >= -10) {
+                        cardHard.classList.add("mv-leve");
+                        valHardEl.style.color = "#b06000";
+                        subHardEl.innerText = `Distancia a su Mejor Versión: ${diffTotalPts} pts (${diffTotalPct}%)`;
+                    } else {
+                        cardHard.classList.add("mv-caida");
+                        valHardEl.style.color = "#c5221f";
+                        subHardEl.innerText = `Caída vs. Mejor Versión: ${diffTotalPts} pts (${diffTotalPct}%)`;
+                    }
 
                     renderRadarChart(detalleMentalEvol);
 
@@ -1157,6 +1226,10 @@
                     const mesesNombres = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
                     let mesActualStr = mesesNombres[new Date().getMonth()];
                     historialFinal = [{month: mesActualStr, mental: mentalPorc, estruc: 0}];
+                }
+
+                if (esEvolucion) {
+                    actualizarProgresoEvolucion(historialFinal, mentalPorc);
                 }
 
                 renderRealCronologyChart(historialFinal, esEvolucion);
