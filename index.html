@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@EnTuLímite Mind-Check | Radiografía Mental Oficial</title>
-    <!-- Librería Chart.js para las gráficas de evolución -->
+    <!-- Librería Chart.js para las gráficas -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -55,6 +55,64 @@
             font-size: 0.92rem;
             background: #fff;
         }
+        .pilar-card {
+            background: #fff;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            border: 1px solid #e0e0e0;
+        }
+        .pilar-titulo {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        .pilar-subgrid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        @media (max-width: 600px) {
+            .pilar-subgrid { grid-template-columns: 1fr; }
+        }
+        .slider-box {
+            background: #f8f9fa;
+            padding: 8px 10px;
+            border-radius: 5px;
+            border: 1px solid #e6e9ef;
+        }
+        .slider-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 4px;
+        }
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .slider-row input {
+            flex: 1;
+            margin: 0;
+        }
+        .slider-val {
+            font-weight: bold;
+            color: var(--primary);
+            min-width: 24px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .pilar-resumen {
+            margin-top: 6px;
+            font-size: 0.78rem;
+            color: #555;
+            text-align: right;
+        }
         .slider-container {
             display: flex;
             align-items: center;
@@ -74,12 +132,6 @@
         .slider-container input {
             flex: 1;
             margin: 0 10px;
-        }
-        .slider-val {
-            font-weight: bold;
-            color: var(--primary);
-            width: 25px;
-            text-align: center;
         }
         .btn {
             background-color: var(--primary);
@@ -168,30 +220,52 @@
             background-color: #f0f4f8;
             color: var(--primary);
         }
-        .ficha-grid-3 {
+        .ficha-grid-2 {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
             margin-bottom: 15px;
+        }
+        @media (max-width: 600px) {
+            .ficha-grid-2 { grid-template-columns: 1fr; }
         }
         .ficha-card {
             background: #FAFAFC;
             border: 1px solid #d0d7de;
-            padding: 10px;
+            padding: 12px;
             border-radius: 6px;
             text-align: center;
         }
         .ficha-card-label {
-            font-size: 0.72rem;
+            font-size: 0.75rem;
             color: #555;
             font-weight: bold;
             text-transform: uppercase;
             margin-bottom: 4px;
         }
         .ficha-card-val {
-            font-size: 1.3rem;
+            font-size: 1.35rem;
             font-weight: bold;
             color: var(--primary);
+        }
+        .ficha-card-sub {
+            font-size: 0.8rem;
+            color: #444;
+            margin-top: 4px;
+        }
+        .radar-wrapper {
+            background: #FAFAFC;
+            border: 1px solid #d0d7de;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .radar-canvas-box {
+            position: relative;
+            height: 320px;
+            width: 100%;
+            max-width: 520px;
+            margin: 0 auto;
         }
 
         /* Matriz de Todas las Zonas */
@@ -330,13 +404,10 @@
         </div>
 
         <div class="ficha-section-title">1. Protocolo Mental (5 Pilares Fundamentales)</div>
-        <div style="font-size: 0.82rem; color: #666; margin-bottom: 10px;">Bajo presión, momentos difíciles o tras un error yo califico del 0 al 10:</div>
-        
-        <div class="slider-container"><label>1. Identificación de Emociones (Reconozco con claridad la emoción sin desbordarme)</label><input type="range" min="0" max="10" value="5" id="p1" oninput="updateVal('p1', 'v1')"><span id="v1" class="slider-val">5</span></div>
-        <div class="slider-container"><label>2. Respiro para Conciencia (Utilizo respiración para regresar al presente)</label><input type="range" min="0" max="10" value="5" id="p2" oninput="updateVal('p2', 'v2')"><span id="v2" class="slider-val">5</span></div>
-        <div class="slider-container"><label>3. Auto-diálogo Constructivo (Genero palabras internas de solución e instrucción)</label><input type="range" min="0" max="10" value="5" id="p3" oninput="updateVal('p3', 'v3')"><span id="v3" class="slider-val">5</span></div>
-        <div class="slider-container"><label>4. Visualización de Ejecución (Proyecto mentalmente la ejecución correcta)</label><input type="range" min="0" max="10" value="5" id="p4" oninput="updateVal('p4', 'v4')"><span id="v4" class="slider-val">5</span></div>
-        <div class="slider-container"><label>5. Agradecimiento y Disfrute (Disfruto independientemente del resultado)</label><input type="range" min="0" max="10" value="5" id="p5" oninput="updateVal('p5', 'v5')"><span id="v5" class="slider-val">5</span></div>
+        <div style="font-size: 0.82rem; color: #666; margin-bottom: 12px;">
+            Califica del 0 al 10 cada pilar en dos escenarios: <strong>En tu mejor versión</strong> vs. <strong>En tu momento más difícil / tras un error o presión</strong>.
+        </div>
+        <div id="mental-sliders"></div>
 
         <div id="seccion-estructural-form">
             <div class="ficha-section-title">2. Soporte Estructural Deportivo (14 Factores de Base)</div>
@@ -397,9 +468,14 @@
         </table>
 
         <!-- DESGLOSE DETALLADO 1: PROTOCOLO MENTAL (5 PILARES) -->
-        <div class="ficha-section-title">1. Protocolo Mental (Detalle de Respuestas)</div>
+        <div class="ficha-section-title">1. Protocolo Mental (Mejor Versión vs. Momento Difícil / Error)</div>
         <table class="ficha-table" id="tabla-rep-mental">
-            <tr><th>Pilar / Puntuación</th><th style="width: 15%; text-align:center;">Pts (0-10)</th></tr>
+            <tr>
+                <th>Pilar Mental</th>
+                <th style="width: 15%; text-align:center;">Mejor Versión</th>
+                <th style="width: 17%; text-align:center;">Momento Difícil / Error</th>
+                <th style="width: 18%; text-align:center;">Distancia a Ideal (10)</th>
+            </tr>
         </table>
 
         <!-- DESGLOSE DETALLADO 2: SOPORTE ESTRUCTURAL (14 FACTORES) -->
@@ -410,20 +486,27 @@
             </table>
         </div>
 
-        <!-- MÉTRICAS IFMI -->
-        <div class="ficha-section-title">3. Índice de Fortaleza Mental Integrado (IFMI) & Matriz de Diagnóstico</div>
-        <div class="ficha-grid-3" id="grid-metricas-rep">
+        <!-- BRECHA CUANTITATIVA RESPECTO AL PERFIL IDEAL + RADAR -->
+        <div class="ficha-section-title">3. Distancia Cuantitativa al Perfil Ideal & Radar Mental</div>
+        <div class="ficha-grid-2">
             <div class="ficha-card">
-                <div class="ficha-card-label">1. Dominio Mental (/50 pts)</div>
-                <div class="ficha-card-val" id="rep-mental-val">0%</div>
-            </div>
-            <div class="ficha-card" id="card-estruc-rep">
-                <div class="ficha-card-label">2. Soporte Estructural (/140 pts)</div>
-                <div class="ficha-card-val" id="rep-estruc-val">0%</div>
+                <div class="ficha-card-label">Perfil Ideal: Mejor Versión (Meta 50/50 = 100%)</div>
+                <div class="ficha-card-val" id="rep-ideal-best">0%</div>
+                <div class="ficha-card-sub" id="rep-brecha-best">--</div>
             </div>
             <div class="ficha-card" style="background: var(--accent);">
-                <div class="ficha-card-label" style="color: var(--primary);">Promedio IFMI (Global)</div>
-                <div class="ficha-card-val" id="rep-ifmi">0%</div>
+                <div class="ficha-card-label" style="color: var(--primary);">Perfil Ideal: Momento Difícil / Error (Meta 50/50 = 100%)</div>
+                <div class="ficha-card-val" id="rep-ideal-hard">0%</div>
+                <div class="ficha-card-sub" id="rep-brecha-hard">--</div>
+            </div>
+        </div>
+
+        <div class="radar-wrapper">
+            <div style="font-size: 0.82rem; font-weight: bold; color: var(--primary); text-align: center; margin-bottom: 8px;">
+                GRÁFICA RADAR: MEJOR VERSIÓN VS. MOMENTO DIFÍCIL / ERROR VS. PERFIL IDEAL (0–10)
+            </div>
+            <div class="radar-canvas-box">
+                <canvas id="chartRadar"></canvas>
             </div>
         </div>
 
@@ -459,20 +542,15 @@
         </div>
 
         <div style="font-size: 0.8rem; font-weight: bold; color: var(--primary); margin-bottom: 5px;">GRÁFICA 1: EVOLUCIÓN DE PROTOCOLO MENTAL (0 a 50 pts / % Mental)</div>
-        <div style="position: relative; height:150px; width:100%; margin-bottom: 15px;">
+        <div style="position: relative; height:170px; width:100%; margin-bottom: 18px;">
             <canvas id="chartMental"></canvas>
         </div>
 
         <div id="bloque-grafica-estruc">
             <div style="font-size: 0.8rem; font-weight: bold; color: var(--primary); margin-bottom: 5px;">GRÁFICA 2: EVOLUCIÓN DE SOPORTE ESTRUCTURAL (0 a 140 pts / % Estructural)</div>
-            <div style="position: relative; height:150px; width:100%; margin-bottom: 15px;">
+            <div style="position: relative; height:170px; width:100%; margin-bottom: 18px;">
                 <canvas id="chartEstruc"></canvas>
             </div>
-        </div>
-
-        <div style="font-size: 0.8rem; font-weight: bold; color: var(--primary); margin-bottom: 5px;">GRÁFICA 3: EVOLUCIÓN PROMEDIO INTEGRADO IFMI (0% a 100%)</div>
-        <div style="position: relative; height:150px; width:100%; margin-bottom: 20px;">
-            <canvas id="chartIfmi"></canvas>
         </div>
 
         <!-- ACCIONES DE IMPRESIÓN -->
@@ -496,7 +574,7 @@
     let currentAthlete = {};
     let tipoEvaluacionGlobal = "Evaluación";
     let modoFirmaActual = "draw";
-    let chartMentalInst = null, chartEstrucInst = null, chartIfmiInst = null;
+    let chartRadarInst = null, chartMentalInst = null, chartEstrucInst = null;
 
     const catalogoZonas = [
         {
@@ -525,13 +603,81 @@
         }
     ];
 
-    const nombresPilares = [
-        "1. Identificación de Emociones",
-        "2. Respiro para Conciencia",
-        "3. Auto-diálogo Constructivo",
-        "4. Visualización de Ejecución",
-        "5. Agradecimiento y Disfrute"
+    const pilaresMentales = [
+        {
+            id: 1,
+            nombre: "1. Identificación de Emociones",
+            corto: "Identificación Emociones",
+            detalle: "Reconozco con claridad la emoción sin desbordarme"
+        },
+        {
+            id: 2,
+            nombre: "2. Respiro para Conciencia",
+            corto: "Respiro Conciencia",
+            detalle: "Utilizo respiración para regresar al presente"
+        },
+        {
+            id: 3,
+            nombre: "3. Auto-diálogo Constructivo",
+            corto: "Auto-diálogo",
+            detalle: "Genero palabras internas de solución e instrucción"
+        },
+        {
+            id: 4,
+            nombre: "4. Visualización de Ejecución",
+            corto: "Visualización",
+            detalle: "Proyecto mentalmente la ejecución correcta"
+        },
+        {
+            id: 5,
+            nombre: "5. Agradecimiento y Disfrute",
+            corto: "Agradecimiento y Disfrute",
+            detalle: "Disfruto independientemente del resultado"
+        }
     ];
+
+    const mentalContainer = document.getElementById("mental-sliders");
+    pilaresMentales.forEach((p) => {
+        mentalContainer.innerHTML += `
+            <div class="pilar-card">
+                <div class="pilar-titulo">${p.nombre} — <span style="font-weight: normal; color: #555;">${p.detalle}</span></div>
+                <div class="pilar-subgrid">
+                    <div class="slider-box">
+                        <div class="slider-top">
+                            <span>En tu mejor versión</span>
+                            <span id="vm_best_${p.id}" class="slider-val">5</span>
+                        </div>
+                        <div class="slider-row">
+                            <input type="range" min="0" max="10" value="5" id="m_best_${p.id}" oninput="actualizarPilarMental(${p.id})">
+                        </div>
+                    </div>
+                    <div class="slider-box">
+                        <div class="slider-top">
+                            <span>En tu momento más difícil / error o presión</span>
+                            <span id="vm_hard_${p.id}" class="slider-val">5</span>
+                        </div>
+                        <div class="slider-row">
+                            <input type="range" min="0" max="10" value="5" id="m_hard_${p.id}" oninput="actualizarPilarMental(${p.id})">
+                        </div>
+                    </div>
+                </div>
+                <div class="pilar-resumen">
+                    Distancia a ideal (10): <strong id="p_dist_best_${p.id}">-5.0</strong> en mejor versión | <strong id="p_dist_hard_${p.id}">-5.0</strong> en momento difícil/error
+                </div>
+            </div>
+        `;
+    });
+
+    function actualizarPilarMental(id) {
+        const best = parseInt(document.getElementById(`m_best_${id}`).value) || 0;
+        const hard = parseInt(document.getElementById(`m_hard_${id}`).value) || 0;
+        document.getElementById(`vm_best_${id}`).innerText = best;
+        document.getElementById(`vm_hard_${id}`).innerText = hard;
+        const distBest = (best - 10).toFixed(1);
+        const distHard = (hard - 10).toFixed(1);
+        document.getElementById(`p_dist_best_${id}`).innerText = distBest === "0.0" ? "0.0 (Ideal)" : distBest;
+        document.getElementById(`p_dist_hard_${id}`).innerText = distHard === "0.0" ? "0.0 (Ideal)" : distHard;
+    }
 
     const factoresEstructurales = [
         "1. Cumplo mis horas de sueño acorde a mi edad",
@@ -660,6 +806,75 @@
         return 'semaforo-rojo';
     }
 
+    function renderRadarChart(detalleMental) {
+        if (chartRadarInst) chartRadarInst.destroy();
+        const radarCtx = document.getElementById("chartRadar");
+        if (!radarCtx) return;
+
+        const labels = pilaresMentales.map(p => p.corto);
+        const dataBest = detalleMental.map(item => item.mejorVersion);
+        const dataHard = detalleMental.map(item => item.momentoDificil);
+        const dataIdeal = pilaresMentales.map(() => 10);
+
+        chartRadarInst = new Chart(radarCtx.getContext("2d"), {
+            type: "radar",
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: "Perfil Ideal (10)",
+                        data: dataIdeal,
+                        borderColor: "#2e7d32",
+                        backgroundColor: "rgba(46, 125, 50, 0.06)",
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        pointRadius: 2
+                    },
+                    {
+                        label: "Mejor Versión",
+                        data: dataBest,
+                        borderColor: "#244777",
+                        backgroundColor: "rgba(36, 71, 119, 0.18)",
+                        borderWidth: 2,
+                        pointBackgroundColor: "#244777"
+                    },
+                    {
+                        label: "Momento Difícil / Error",
+                        data: dataHard,
+                        borderColor: "#c62828",
+                        backgroundColor: "rgba(198, 40, 40, 0.14)",
+                        borderWidth: 2,
+                        pointBackgroundColor: "#c62828"
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        min: 0,
+                        max: 10,
+                        ticks: {
+                            stepSize: 2,
+                            backdropColor: "transparent"
+                        },
+                        pointLabels: {
+                            font: { size: 11, weight: "600" },
+                            color: "#1A1C1E"
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        labels: { boxWidth: 14, font: { size: 11 } }
+                    }
+                }
+            }
+        });
+    }
+
     async function validarAtleta() {
         let id = document.getElementById("id_atleta").value.trim();
         let msgDiv = document.getElementById("auth-msg");
@@ -705,20 +920,33 @@
             sigBoxAtleta.innerHTML = `<div style="font-family: 'Brush Script MT', cursive, sans-serif; font-size: 1.1rem; color: #244777;">${nombreEscrito}</div><span style="font-size:0.75rem;">Firma Atleta</span>`;
         }
 
+        const detalleMental = pilaresMentales.map((p) => {
+            const best = parseInt(document.getElementById(`m_best_${p.id}`).value) || 0;
+            const hard = parseInt(document.getElementById(`m_hard_${p.id}`).value) || 0;
+            const prom = parseFloat(((best + hard) / 2).toFixed(1));
+            return {
+                id: p.id,
+                nombre: p.nombre,
+                mejorVersion: best,
+                momentoDificil: hard,
+                promedio: prom
+            };
+        });
+
         let payload = {
             id_atleta: currentAthlete.id,
             deporte_equipo: currentAthlete.equipo,
             cadencia: tipoEvaluacionGlobal,
-            p1: document.getElementById("p1").value,
-            p2: document.getElementById("p2").value,
-            p3: document.getElementById("p3").value,
-            p4: document.getElementById("p4").value,
-            p5: document.getElementById("p5").value,
+            p1: detalleMental[0].promedio,
+            p2: detalleMental[1].promedio,
+            p3: detalleMental[2].promedio,
+            p4: detalleMental[3].promedio,
+            p5: detalleMental[4].promedio,
+            mental_detalle: detalleMental,
             micro_objetivo: document.getElementById("micro_objetivo").value,
             firma_url: firmaFinal
         };
 
-        let valoresMentalArr = [payload.p1, payload.p2, payload.p3, payload.p4, payload.p5];
         let valoresEstrucArr = [];
 
         for(let i = 1; i <= 14; i++) {
@@ -741,41 +969,74 @@
                 document.getElementById("rep-equipo").innerText = currentAthlete.equipo;
                 document.getElementById("rep-objetivo").innerText = payload.micro_objetivo || "Sin micro-objetivo especificado.";
 
-                let tablaMentalHtml = `<tr><th>Pilar / Puntuación</th><th style="text-align:center;">Pts (0-10)</th></tr>`;
-                nombresPilares.forEach((nombre, idx) => {
-                    let val = valoresMentalArr[idx];
-                    let claseSemaforo = obtenerClaseSemaforo(val);
-                    tablaMentalHtml += `<tr><td>${nombre}</td><td style="text-align:center;font-weight:bold;" class="${claseSemaforo}">${val}</td></tr>`;
+                let tablaMentalHtml = `
+                    <tr>
+                        <th>Pilar Mental</th>
+                        <th style="width: 15%; text-align:center;">Mejor Versión</th>
+                        <th style="width: 17%; text-align:center;">Momento Difícil / Error</th>
+                        <th style="width: 18%; text-align:center;">Distancia a Ideal (10)</th>
+                    </tr>`;
+
+                let bestSum = 0;
+                let hardSum = 0;
+
+                detalleMental.forEach((item) => {
+                    bestSum += item.mejorVersion;
+                    hardSum += item.momentoDificil;
+                    const claseBest = obtenerClaseSemaforo(item.mejorVersion);
+                    const claseHard = obtenerClaseSemaforo(item.momentoDificil);
+                    const distBest = (item.mejorVersion - 10).toFixed(1);
+                    const distHard = (item.momentoDificil - 10).toFixed(1);
+
+                    tablaMentalHtml += `
+                        <tr>
+                            <td>${item.nombre}</td>
+                            <td style="text-align:center;font-weight:bold;" class="${claseBest}">${item.mejorVersion}</td>
+                            <td style="text-align:center;font-weight:bold;" class="${claseHard}">${item.momentoDificil}</td>
+                            <td style="text-align:center;font-size:0.8rem;">MV: <strong>${distBest}</strong> | MD: <strong>${distHard}</strong></td>
+                        </tr>`;
                 });
                 document.getElementById("tabla-rep-mental").innerHTML = tablaMentalHtml;
 
-                let mentalSum = valoresMentalArr.reduce((a, b) => parseInt(a) + parseInt(b), 0);
-                let mentalPorc = ((mentalSum / 50) * 100).toFixed(1);
-                document.getElementById("rep-mental-val").innerText = mentalPorc + "% (" + mentalSum + "/50)";
+                // Cuantificación de distancia/cercanía respecto al perfil ideal (50 pts = 100%)
+                const pctBest = ((bestSum / 50) * 100).toFixed(1);
+                const pctHard = ((hardSum / 50) * 100).toFixed(1);
+                const brechaPtsBest = (bestSum - 50).toFixed(1);
+                const brechaPtsHard = (hardSum - 50).toFixed(1);
+                const brechaPctBest = (parseFloat(pctBest) - 100).toFixed(1);
+                const brechaPctHard = (parseFloat(pctHard) - 100).toFixed(1);
+
+                document.getElementById("rep-ideal-best").innerText = `${pctBest}% (${bestSum}/50 pts)`;
+                document.getElementById("rep-brecha-best").innerText =
+                    bestSum === 50
+                        ? "En perfil ideal (0.0 pts de distancia)"
+                        : `Distancia al ideal: ${brechaPtsBest} pts (${brechaPctBest}%)`;
+
+                document.getElementById("rep-ideal-hard").innerText = `${pctHard}% (${hardSum}/50 pts)`;
+                document.getElementById("rep-brecha-hard").innerText =
+                    hardSum === 50
+                        ? "En perfil ideal (0.0 pts de distancia)"
+                        : `Distancia al ideal: ${brechaPtsHard} pts (${brechaPctHard}%)`;
+
+                renderRadarChart(detalleMental);
+
+                const mentalSum = detalleMental.reduce((acc, item) => acc + item.promedio, 0);
+                const mentalPorc = ((mentalSum / 50) * 100).toFixed(1);
 
                 const bloqueRepEstruc = document.getElementById("bloque-rep-estructural");
-                const cardEstrucRep = document.getElementById("card-estruc-rep");
-                const gridMetricas = document.getElementById("grid-metricas-rep");
                 const bloqueZonasRep = document.getElementById("bloque-zonas-rep");
                 const bloqueGraficaEstruc = document.getElementById("bloque-grafica-estruc");
 
-                let ifmi = mentalPorc;
-
                 if (esEvolucion) {
                     bloqueRepEstruc.classList.add("hidden");
-                    cardEstrucRep.classList.add("hidden");
                     bloqueZonasRep.classList.add("hidden");
                     bloqueGraficaEstruc.classList.add("hidden");
-                    gridMetricas.style.gridTemplateColumns = "repeat(2, 1fr)";
-                    document.getElementById("rep-ifmi").innerText = ifmi + "%";
                 } else {
                     bloqueRepEstruc.classList.remove("hidden");
-                    cardEstrucRep.classList.remove("hidden");
                     bloqueZonasRep.classList.remove("hidden");
                     bloqueGraficaEstruc.classList.remove("hidden");
-                    gridMetricas.style.gridTemplateColumns = "repeat(3, 1fr)";
 
-                    let tablaEstrucHtml = `<tr><th>Factor Estructural / Puntuación</th><th style="text-align:center;">Pts (0-10)</th></tr>`;
+                    let tablaEstrucHtml = `<tr><th>Factor Estructural / Puntuación</th><th style="width: 15%; text-align:center;">Pts (0-10)</th></tr>`;
                     factoresEstructurales.forEach((nombre, idx) => {
                         let val = valoresEstrucArr[idx];
                         let claseSemaforo = obtenerClaseSemaforo(val);
@@ -785,10 +1046,6 @@
 
                     let estrucSum = valoresEstrucArr.reduce((a, b) => parseInt(a) + parseInt(b), 0);
                     let estrucPorc = ((estrucSum / 140) * 100).toFixed(1);
-                    ifmi = ((parseFloat(mentalPorc) + parseFloat(estrucPorc)) / 2).toFixed(1);
-
-                    document.getElementById("rep-estruc-val").innerText = estrucPorc + "% (" + estrucSum + "/140)";
-                    document.getElementById("rep-ifmi").innerText = ifmi + "%";
 
                     let zonaActivaId = "ZONA_4";
                     if(parseFloat(mentalPorc) >= 80 && parseFloat(estrucPorc) >= 80) {
@@ -807,7 +1064,7 @@
                 if (!historialFinal || historialFinal.length === 0) {
                     const mesesNombres = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
                     let mesActualStr = mesesNombres[new Date().getMonth()];
-                    historialFinal = [{month: mesActualStr, mental: mentalPorc, estruc: 0, ifmi: ifmi}];
+                    historialFinal = [{month: mesActualStr, mental: mentalPorc, estruc: 0}];
                 }
 
                 renderRealCronologyChart(historialFinal, esEvolucion);
@@ -842,18 +1099,16 @@
             
             let mental = parseFloat(item.mental) || 0;
             let estruc = parseFloat(item.estruc) || 0;
-            let ifmi = parseFloat(item.ifmi) || 0;
 
             if (anio < anioActual) {
                 if (!aniosAnterioresMap[anio]) {
-                    aniosAnterioresMap[anio] = { sumM: 0, sumE: 0, sumI: 0, count: 0 };
+                    aniosAnterioresMap[anio] = { sumM: 0, sumE: 0, count: 0 };
                 }
                 aniosAnterioresMap[anio].sumM += mental;
                 aniosAnterioresMap[anio].sumE += estruc;
-                aniosAnterioresMap[anio].sumI += ifmi;
                 aniosAnterioresMap[anio].count += 1;
             } else {
-                mesesAnioActual.push({ mes, mental, estruc, ifmi });
+                mesesAnioActual.push({ mes, mental, estruc });
             }
         });
 
@@ -865,26 +1120,22 @@
         const labels = [];
         const dataM = [];
         const dataE = [];
-        const dataI = [];
 
         aniosOrdenados.forEach(anio => {
             const g = aniosAnterioresMap[anio];
             labels.push(`Prom ${anio}`);
             dataM.push((g.sumM / g.count).toFixed(1));
             dataE.push((g.sumE / g.count).toFixed(1));
-            dataI.push((g.sumI / g.count).toFixed(1));
         });
 
         mesesAnioActual.forEach(reg => {
             labels.push(reg.mes);
             dataM.push(reg.mental);
             dataE.push(reg.estruc);
-            dataI.push(reg.ifmi);
         });
 
         if (chartMentalInst) chartMentalInst.destroy();
         if (chartEstrucInst) chartEstrucInst.destroy();
-        if (chartIfmiInst) chartIfmiInst.destroy();
 
         const commonOptions = {
             responsive: true,
@@ -905,12 +1156,6 @@
                 options: commonOptions
             });
         }
-
-        chartIfmiInst = new Chart(document.getElementById('chartIfmi').getContext('2d'), {
-            type: 'line',
-            data: { labels: labels, datasets: [{ label: 'Promedio IFMI (%)', data: dataI, borderColor: '#2e7d32', backgroundColor: 'rgba(46, 125, 50, 0.1)', borderWidth: 2, fill: true, tension: 0.2, spanGaps: false }] },
-            options: commonOptions
-        });
     }
 </script>
 
