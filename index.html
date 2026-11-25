@@ -45,12 +45,15 @@
             margin-bottom: 5px;
             font-size: 0.9rem;
         }
-        input[type="text"], textarea {
+        input[type="text"], select, textarea {
             width: 100%;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 6px;
             box-sizing: border-box;
+            font-family: inherit;
+            font-size: 0.92rem;
+            background: #fff;
         }
         .slider-container {
             display: flex;
@@ -190,13 +193,62 @@
             font-weight: bold;
             color: var(--primary);
         }
-        .zona-box {
-            background: #eef2f7;
-            border-left: 4px solid var(--primary);
-            padding: 12px 15px;
-            border-radius: 4px;
+
+        /* Matriz de Todas las Zonas */
+        .zonas-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
             margin-bottom: 15px;
         }
+        .zona-card {
+            background: #f8f9fa;
+            border: 1px solid #d0d7de;
+            border-left: 4px solid #adb5bd;
+            padding: 10px 14px;
+            border-radius: 5px;
+            opacity: 0.88;
+        }
+        .zona-card.activa {
+            background: #eef2f7;
+            border: 2px solid var(--primary);
+            border-left: 6px solid var(--primary);
+            opacity: 1;
+            box-shadow: 0 2px 8px rgba(36, 71, 119, 0.12);
+        }
+        .zona-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+        .zona-card-titulo {
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        .badge-zona-actual {
+            background: var(--primary);
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+        }
+        .zona-card-desc {
+            font-size: 0.84rem;
+            margin: 0 0 4px 0;
+            line-height: 1.35;
+            color: #333;
+        }
+        .zona-card-est {
+            font-size: 0.82rem;
+            margin: 0;
+            color: #444;
+        }
+
         .signatures-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -232,6 +284,7 @@
             .container { box-shadow: none; padding: 0; max-width: 100%; }
             .no-print { display: none !important; }
             .page-break { page-break-before: always; }
+            .zona-card { opacity: 1; }
         }
     </style>
 </head>
@@ -263,10 +316,18 @@
         <div class="ficha-header">
             <div class="ficha-logo">
                 <h1>@EnTuLímite</h1>
-                <span id="form-tipo-eval">Evaluación Activa | Mind-Check</span>
+                <span id="form-tipo-eval">Registro Activo | Mind-Check</span>
             </div>
         </div>
         <div id="athlete-info" class="alert alert-success" style="font-weight: bold;"></div>
+
+        <div class="form-group" style="background: #f0f4f8; padding: 12px 15px; border-radius: 6px; border: 1px solid #d0d7de;">
+            <label for="tipo_registro">¿Qué tipo de registro vas a realizar hoy?</label>
+            <select id="tipo_registro" onchange="actualizarTipoRegistro()">
+                <option value="Evaluación">Evaluación</option>
+                <option value="Evolución">Evolución</option>
+            </select>
+        </div>
 
         <div class="ficha-section-title">1. Protocolo Mental (5 Pilares Fundamentales)</div>
         <div style="font-size: 0.82rem; color: #666; margin-bottom: 10px;">Bajo presión, momentos difíciles o tras un error yo califico del 0 al 10:</div>
@@ -362,17 +423,9 @@
             </div>
         </div>
 
-        <!-- DESCRIPCIÓN DETALLADA DE LA ZONA Y DIAGNÓSTICO -->
-        <div class="zona-box">
-            <div style="font-size: 0.78rem; font-weight: bold; color: #555; text-transform: uppercase;">Zona Asignada & Diagnóstico del Atleta:</div>
-            <div id="rep-zona-titulo" style="font-size: 1.1rem; font-weight: bold; color: var(--primary); margin: 4px 0;">--</div>
-            <p id="rep-zona-desc" style="font-size: 0.88rem; margin: 0; line-height: 1.4; color: #333;">--</p>
-        </div>
-
-        <div style="background: #f8f9fa; border: 1px solid #d0d7de; padding: 10px; border-radius: 4px; margin-bottom: 15px;">
-            <strong style="font-size: 0.82rem; color: var(--primary);">Estrategia / Acción Recomendada:</strong>
-            <p id="rep-zona-estrategia" style="font-size: 0.85rem; margin: 4px 0 0 0; color: #444;">--</p>
-        </div>
+        <!-- TODAS LAS ZONAS VISIBLES (RESALTANDO LA ZONA ASIGNADA) -->
+        <div class="ficha-section-title">4. Matriz Completa de Zonas y Estrategia</div>
+        <div id="zonas-completas" class="zonas-grid"></div>
 
         <!-- MICRO-OBJETIVO -->
         <div class="ficha-section-title">Compromiso de Acción: Micro-objetivo (Próximas 2 semanas)</div>
@@ -433,9 +486,36 @@
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwDBbCX70eZ3Uk2pF_lP-JBeNuhLIn-LPElukI8VXEcuGe2tDS42NlBvc4m5mCzOSB2/exec";
     
     let currentAthlete = {};
-    let tipoEvaluacionGlobal = "Inicial";
+    let tipoEvaluacionGlobal = "Evaluación";
     let modoFirmaActual = "draw";
     let chartMentalInst = null, chartEstrucInst = null, chartIfmiInst = null;
+
+    const catalogoZonas = [
+        {
+            id: "ZONA_1",
+            titulo: "ZONA 1: FORTALEZA INTEGRADA",
+            desc: "Atleta constante en cuerpo y mente. Sus hábitos físicos sostienen sus rituales mentales. Alineación total.",
+            estrategia: "Afinación fina, liderazgo, simulación de escenarios de máxima presión y consolidación de hábitos. (Planificar cargas de trabajo)"
+        },
+        {
+            id: "ZONA_2",
+            titulo: "ZONA 2: FUGA ESTRUCTURAL",
+            desc: "Mente entrenada, pero el rendimiento disminuye por fallas en la estructura deportiva entorno o físico (sueño, nutrición, descanso, salud física, etc.).",
+            estrategia: "Padres/entrenadores: El problema no es la mente, sino la falta de soporte, descanso o recuperación física. Ajustar la micro-rutina diaria."
+        },
+        {
+            id: "ZONA_3",
+            titulo: "ZONA 3: DÉFICIT AUTORREGULACIÓN",
+            desc: "Cumple con la estructura de soporte, pero carece de constancia en sus 5 rituales mentales diarios (Protocolo mental).",
+            estrategia: "Atleta: Ajustar la micro-rutina diaria y establecer anclajes cortos para automatizar confianza sin depender de lo externo ni de resultados."
+        },
+        {
+            id: "ZONA_4",
+            titulo: "ZONA 4: ALERTA RENDIMIENTO",
+            desc: "Vulnerabilidad crítica en hábitos de vida y en control emocional/mental. Opera bajo el mínimo funcional.",
+            estrategia: "Reestructuración: Sesión prioritaria profunda entre atleta, padres y entrenadores para reconstruir toda la base estructural y psicológica."
+        }
+    ];
 
     const nombresPilares = [
         "1. Identificación de Emociones",
@@ -476,6 +556,32 @@
 
     function updateVal(sliderId, valId) {
         document.getElementById(valId).innerText = document.getElementById(sliderId).value;
+    }
+
+    function actualizarTipoRegistro() {
+        const selectEl = document.getElementById("tipo_registro");
+        tipoEvaluacionGlobal = selectEl ? selectEl.value : "Evaluación";
+        document.getElementById("form-tipo-eval").innerText = `${tipoEvaluacionGlobal} | Mind-Check`;
+        if (currentAthlete && currentAthlete.nombre) {
+            document.getElementById("athlete-info").innerText = `Atleta: ${currentAthlete.nombre} | Equipo/Disciplina: ${currentAthlete.equipo} | Tipo: ${tipoEvaluacionGlobal}`;
+        }
+    }
+
+    function renderMatrizZonas(zonaActivaId) {
+        const contenedor = document.getElementById("zonas-completas");
+        contenedor.innerHTML = catalogoZonas.map(z => {
+            const esActiva = z.id === zonaActivaId;
+            return `
+                <div class="zona-card ${esActiva ? 'activa' : ''}">
+                    <div class="zona-card-header">
+                        <span class="zona-card-titulo">${z.titulo}</span>
+                        ${esActiva ? '<span class="badge-zona-actual">Zona Asignada</span>' : ''}
+                    </div>
+                    <p class="zona-card-desc">${z.desc}</p>
+                    <p class="zona-card-est"><strong>Estrategia / Acción Recomendada:</strong> ${z.estrategia}</p>
+                </div>
+            `;
+        }).join("");
     }
 
     function cambiarModoFirma(modo) {
@@ -545,12 +651,14 @@
             let data = await response.json();
             if(data.exists) {
                 currentAthlete = { id: id, nombre: data.nombre, equipo: data.equipo, isInitial: data.isInitial };
-                tipoEvaluacionGlobal = data.isInitial ? "Evaluación Inicial" : "Evaluación de Seguimiento";
+                const valorSugerido = data.isInitial ? "Evaluación" : "Evolución";
+                document.getElementById("tipo_registro").value = valorSugerido;
+                tipoEvaluacionGlobal = valorSugerido;
 
                 document.getElementById("form-tipo-eval").innerText = `${tipoEvaluacionGlobal} | Mind-Check`;
                 document.getElementById("step-auth").classList.add("hidden");
                 document.getElementById("eval-form").classList.remove("hidden");
-                document.getElementById("athlete-info").innerText = `Atleta: ${data.nombre} | Equipo/Disciplina: ${data.equipo} (${tipoEvaluacionGlobal})`;
+                document.getElementById("athlete-info").innerText = `Atleta: ${data.nombre} | Equipo/Disciplina: ${data.equipo} | Tipo: ${tipoEvaluacionGlobal}`;
             } else {
                 msgDiv.innerHTML = `<div class="alert alert-error">Correo no encontrado o inactivo en la base de datos.</div>`;
             }
@@ -564,6 +672,8 @@
         let btn = document.getElementById("btn-submit");
         btn.innerText = "Generando ficha oficial...";
         btn.disabled = true;
+
+        tipoEvaluacionGlobal = document.getElementById("tipo_registro").value || "Evaluación";
 
         let firmaFinal = "";
         let sigBoxAtleta = document.getElementById("sig-box-atleta");
@@ -640,29 +750,18 @@
                 document.getElementById("rep-estruc-val").innerText = estrucPorc + "% (" + estrucSum + "/140)";
                 document.getElementById("rep-ifmi").innerText = ifmi + "%";
 
-                let zonaTitulo = "", zonaDesc = "", zonaEstrategia = "";
-                
-                if(mentalPorc >= 80 && estrucPorc >= 80) {
-                    zonaTitulo = "ZONA 1: FORTALEZA INTEGRADA";
-                    zonaDesc = "Atleta constante en cuerpo y mente. Sus hábitos físicos sostienen sus rituales mentales. Alineación total.";
-                    zonaEstrategia = "Afinación fina, liderazgo, simulación de escenarios de máxima presión y consolidación de hábitos. (Planificar cargas de trabajo)";
-                } else if(mentalPorc >= 80 && estrucPorc < 80) {
-                    zonaTitulo = "ZONA 2: FUGA ESTRUCTURAL";
-                    zonaDesc = "Mente entrenada, pero el rendimiento disminuye por fallas en la estructura deportiva entorno o físico (sueño, nutrición, descanso, salud física, etc.).";
-                    zonaEstrategia = "Padres/entrenadores: El problema no es la mente, sino la falta de soporte, descanso o recuperación física. Ajustar la micro-rutina diaria.";
-                } else if(mentalPorc < 80 && estrucPorc >= 80) {
-                    zonaTitulo = "ZONA 3: DÉFICIT AUTORREGULACIÓN";
-                    zonaDesc = "Cumple con la estructura de soporte, pero carece de constancia en sus 5 rituales mentales diarios (Protocolo mental).";
-                    zonaEstrategia = "Atleta: Ajustar la micro-rutina diaria y establecer anclajes cortos para automatizar confianza sin depender de lo externo ni de resultados.";
+                let zonaActivaId = "ZONA_4";
+                if(parseFloat(mentalPorc) >= 80 && parseFloat(estrucPorc) >= 80) {
+                    zonaActivaId = "ZONA_1";
+                } else if(parseFloat(mentalPorc) >= 80 && parseFloat(estrucPorc) < 80) {
+                    zonaActivaId = "ZONA_2";
+                } else if(parseFloat(mentalPorc) < 80 && parseFloat(estrucPorc) >= 80) {
+                    zonaActivaId = "ZONA_3";
                 } else {
-                    zonaTitulo = "ZONA 4: ALERTA RENDIMIENTO";
-                    zonaDesc = "Vulnerabilidad crítica en hábitos de vida y en control emocional/mental. Opera bajo el mínimo funcional.";
-                    zonaEstrategia = "Reestructuración: Sesión prioritaria profunda entre atleta, padres y entrenadores para reconstruir toda la base estructural y psicológica.";
+                    zonaActivaId = "ZONA_4";
                 }
 
-                document.getElementById("rep-zona-titulo").innerText = zonaTitulo;
-                document.getElementById("rep-zona-desc").innerText = zonaDesc;
-                document.getElementById("rep-zona-estrategia").innerText = zonaEstrategia;
+                renderMatrizZonas(zonaActivaId);
 
                 let historialFinal = result.history;
                 if (!historialFinal || historialFinal.length === 0) {
