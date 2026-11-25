@@ -405,7 +405,7 @@
         </div>
     </div>
 
-    <!-- PASO 2: FORMULARIO DE EVALUACIÓN -->
+    <!-- PASO 2: FORMULARIO DE EVALUACIÓN / EVOLUCIÓN -->
     <form id="eval-form" class="hidden no-print" onsubmit="enviarEvaluacion(event)">
         <div class="ficha-header">
             <div class="ficha-logo">
@@ -424,11 +424,26 @@
         </div>
 
         <div class="ficha-section-title">1. Protocolo Mental (5 Pilares Fundamentales)</div>
-        <div style="font-size: 0.82rem; color: #666; margin-bottom: 12px;">
-            Califica del 0 al 10 cada pilar en dos escenarios: <strong>En tu mejor versión</strong> vs. <strong>En tu momento más difícil / tras un error o presión</strong>.
-        </div>
-        <div id="mental-sliders"></div>
 
+        <!-- MODO EVALUACIÓN (NO COMPARATIVA) -->
+        <div id="mental-eval-mode">
+            <div style="font-size: 0.82rem; color: #666; margin-bottom: 10px;">Bajo presión, momentos difíciles o tras un error yo califico del 0 al 10:</div>
+            <div class="slider-container"><label>1. Identificación de Emociones (Reconozco con claridad la emoción sin desbordarme)</label><input type="range" min="0" max="10" value="5" id="p1" oninput="updateVal('p1', 'v1')"><span id="v1" class="slider-val">5</span></div>
+            <div class="slider-container"><label>2. Respiro para Conciencia (Utilizo respiración para regresar al presente)</label><input type="range" min="0" max="10" value="5" id="p2" oninput="updateVal('p2', 'v2')"><span id="v2" class="slider-val">5</span></div>
+            <div class="slider-container"><label>3. Auto-diálogo Constructivo (Genero palabras internas de solución e instrucción)</label><input type="range" min="0" max="10" value="5" id="p3" oninput="updateVal('p3', 'v3')"><span id="v3" class="slider-val">5</span></div>
+            <div class="slider-container"><label>4. Visualización de Ejecución (Proyecto mentalmente la ejecución correcta)</label><input type="range" min="0" max="10" value="5" id="p4" oninput="updateVal('p4', 'v4')"><span id="v4" class="slider-val">5</span></div>
+            <div class="slider-container"><label>5. Agradecimiento y Disfrute (Disfruto independientemente del resultado)</label><input type="range" min="0" max="10" value="5" id="p5" oninput="updateVal('p5', 'v5')"><span id="v5" class="slider-val">5</span></div>
+        </div>
+
+        <!-- MODO EVOLUCIÓN (COMPARATIVA) -->
+        <div id="mental-evol-mode" class="hidden">
+            <div style="font-size: 0.82rem; color: #666; margin-bottom: 12px;">
+                Califica del 0 al 10 cada pilar en dos escenarios: <strong>En tu mejor versión</strong> vs. <strong>En tu momento más difícil / tras un error o presión</strong>.
+            </div>
+            <div id="mental-sliders"></div>
+        </div>
+
+        <!-- SOPORTE ESTRUCTURAL (SOLO EN EVALUACIÓN) -->
         <div id="seccion-estructural-form">
             <div class="ficha-section-title">2. Soporte Estructural Deportivo (14 Factores de Base)</div>
             <div style="font-size: 0.82rem; color: #666; margin-bottom: 10px;">Valora del 0 al 10 el cumplimiento real de tus bases:</div>
@@ -487,18 +502,13 @@
             </tr>
         </table>
 
-        <!-- DESGLOSE DETALLADO 1: PROTOCOLO MENTAL (5 PILARES) -->
-        <div class="ficha-section-title">1. Protocolo Mental (Mejor Versión vs. Momento Difícil / Error)</div>
+        <!-- DESGLOSE DETALLADO 1: PROTOCOLO MENTAL -->
+        <div class="ficha-section-title" id="rep-titulo-mental">1. Protocolo Mental (Detalle de Respuestas)</div>
         <table class="ficha-table" id="tabla-rep-mental">
-            <tr>
-                <th>Pilar Mental</th>
-                <th style="width: 15%; text-align:center;">Mejor Versión</th>
-                <th style="width: 17%; text-align:center;">Momento Difícil / Error</th>
-                <th style="width: 20%; text-align:center;">Perfil Prime (10)</th>
-            </tr>
+            <tr><th>Pilar / Puntuación</th><th style="width: 15%; text-align:center;">Pts (0-10)</th></tr>
         </table>
 
-        <!-- DESGLOSE DETALLADO 2: SOPORTE ESTRUCTURAL (14 FACTORES) -->
+        <!-- DESGLOSE DETALLADO 2: SOPORTE ESTRUCTURAL (SOLO EN EVALUACIÓN) -->
         <div id="bloque-rep-estructural">
             <div class="ficha-section-title">2. Soporte Estructural Deportivo (Detalle de Respuestas)</div>
             <table class="ficha-table" id="tabla-rep-estruc">
@@ -506,33 +516,35 @@
             </table>
         </div>
 
-        <!-- BRECHA CUANTITATIVA RESPECTO AL PERFIL IDEAL + RADAR -->
-        <div class="ficha-section-title">3. Distancia Cuantitativa al Perfil Ideal & Radar Mental</div>
-        <div class="ficha-grid-2">
-            <div class="ficha-card" id="card-ideal-best">
-                <div class="ficha-card-label">Perfil Ideal: Mejor Versión (Meta 50/50 = 100%)</div>
-                <div class="ficha-card-val" id="rep-ideal-best">0%</div>
-                <div class="ficha-card-sub" id="rep-brecha-best">--</div>
+        <!-- SECCIÓN EXCLUSIVA DE EVOLUCIÓN: DISTANCIA AL PERFIL PRIME + RADAR -->
+        <div id="bloque-evolucion-prime" class="hidden">
+            <div class="ficha-section-title">2. Distancia Cuantitativa al Perfil Prime & Radar Mental</div>
+            <div class="ficha-grid-2">
+                <div class="ficha-card" id="card-ideal-best">
+                    <div class="ficha-card-label">Perfil Prime: Mejor Versión (Meta 50/50 = 100%)</div>
+                    <div class="ficha-card-val" id="rep-ideal-best">0%</div>
+                    <div class="ficha-card-sub" id="rep-brecha-best">--</div>
+                </div>
+                <div class="ficha-card" id="card-ideal-hard">
+                    <div class="ficha-card-label">Perfil Prime: Momento Difícil / Error (Meta 50/50 = 100%)</div>
+                    <div class="ficha-card-val" id="rep-ideal-hard">0%</div>
+                    <div class="ficha-card-sub" id="rep-brecha-hard">--</div>
+                </div>
             </div>
-            <div class="ficha-card" id="card-ideal-hard">
-                <div class="ficha-card-label">Perfil Ideal: Momento Difícil / Error (Meta 50/50 = 100%)</div>
-                <div class="ficha-card-val" id="rep-ideal-hard">0%</div>
-                <div class="ficha-card-sub" id="rep-brecha-hard">--</div>
+
+            <div class="radar-wrapper">
+                <div style="font-size: 0.82rem; font-weight: bold; color: var(--primary); text-align: center; margin-bottom: 8px;">
+                    GRÁFICA RADAR: MEJOR VERSIÓN VS. MOMENTO DIFÍCIL / ERROR VS. PERFIL PRIME (0–10)
+                </div>
+                <div class="radar-canvas-box">
+                    <canvas id="chartRadar"></canvas>
+                </div>
             </div>
         </div>
 
-        <div class="radar-wrapper">
-            <div style="font-size: 0.82rem; font-weight: bold; color: var(--primary); text-align: center; margin-bottom: 8px;">
-                GRÁFICA RADAR: MEJOR VERSIÓN VS. MOMENTO DIFÍCIL / ERROR VS. PERFIL IDEAL (0–10)
-            </div>
-            <div class="radar-canvas-box">
-                <canvas id="chartRadar"></canvas>
-            </div>
-        </div>
-
-        <!-- TODAS LAS ZONAS VISIBLES (RESALTANDO LA ZONA ASIGNADA) -->
+        <!-- TODAS LAS ZONAS VISIBLES (SOLO EN EVALUACIÓN) -->
         <div id="bloque-zonas-rep">
-            <div class="ficha-section-title">4. Matriz Completa de Zonas y Estrategia</div>
+            <div class="ficha-section-title">3. Matriz Completa de Zonas y Estrategia</div>
             <div id="zonas-completas" class="zonas-grid"></div>
         </div>
 
@@ -623,7 +635,15 @@
         }
     ];
 
-    const pilaresMentales = [
+    const nombresPilaresEval = [
+        "1. Identificación de Emociones",
+        "2. Respiro para Conciencia",
+        "3. Auto-diálogo Constructivo",
+        "4. Visualización de Ejecución",
+        "5. Agradecimiento y Disfrute"
+    ];
+
+    const pilaresMentalesEvol = [
         {
             id: 1,
             nombre: "1. Identificación de Emociones",
@@ -657,7 +677,7 @@
     ];
 
     const mentalContainer = document.getElementById("mental-sliders");
-    pilaresMentales.forEach((p) => {
+    pilaresMentalesEvol.forEach((p) => {
         mentalContainer.innerHTML += `
             <div class="pilar-card">
                 <div class="pilar-titulo">${p.nombre} — <span style="font-weight: normal; color: #555;">${p.detalle}</span></div>
@@ -682,7 +702,7 @@
                     </div>
                 </div>
                 <div class="pilar-resumen">
-                    Distancia a ideal (10): <strong id="p_dist_best_${p.id}">-5.0</strong> en mejor versión | <strong id="p_dist_hard_${p.id}">-5.0</strong> en momento difícil/error
+                    Distancia a Prime (10): <strong id="p_dist_best_${p.id}">-5.0</strong> en mejor versión | <strong id="p_dist_hard_${p.id}">-5.0</strong> en momento difícil/error
                 </div>
             </div>
         `;
@@ -742,10 +762,9 @@
             document.getElementById("athlete-info").innerText = `Atleta: ${currentAthlete.nombre} | Equipo/Disciplina: ${currentAthlete.equipo} | Tipo: ${tipoEvaluacionGlobal}`;
         }
 
-        const secEstructuralForm = document.getElementById("seccion-estructural-form");
-        if (secEstructuralForm) {
-            secEstructuralForm.classList.toggle("hidden", esEvolucion);
-        }
+        document.getElementById("mental-eval-mode").classList.toggle("hidden", esEvolucion);
+        document.getElementById("mental-evol-mode").classList.toggle("hidden", !esEvolucion);
+        document.getElementById("seccion-estructural-form").classList.toggle("hidden", esEvolucion);
     }
 
     function obtenerClasePrimeValor(val) {
@@ -857,10 +876,10 @@
         const radarCtx = document.getElementById("chartRadar");
         if (!radarCtx) return;
 
-        const labels = pilaresMentales.map(p => p.corto);
+        const labels = pilaresMentalesEvol.map(p => p.corto);
         const dataBest = detalleMental.map(item => item.mejorVersion);
         const dataHard = detalleMental.map(item => item.momentoDificil);
-        const dataIdeal = pilaresMentales.map(() => 10);
+        const dataPrime = pilaresMentalesEvol.map(() => 10);
 
         chartRadarInst = new Chart(radarCtx.getContext("2d"), {
             type: "radar",
@@ -869,7 +888,7 @@
                 datasets: [
                     {
                         label: "Perfil Prime (10)",
-                        data: dataIdeal,
+                        data: dataPrime,
                         borderColor: "#137333",
                         backgroundColor: "rgba(19, 115, 51, 0.08)",
                         borderWidth: 2,
@@ -966,37 +985,47 @@
             sigBoxAtleta.innerHTML = `<div style="font-family: 'Brush Script MT', cursive, sans-serif; font-size: 1.1rem; color: #244777;">${nombreEscrito}</div><span style="font-size:0.75rem;">Firma Atleta</span>`;
         }
 
-        const detalleMental = pilaresMentales.map((p) => {
-            const best = parseInt(document.getElementById(`m_best_${p.id}`).value) || 0;
-            const hard = parseInt(document.getElementById(`m_hard_${p.id}`).value) || 0;
-            const prom = parseFloat(((best + hard) / 2).toFixed(1));
-            return {
-                id: p.id,
-                nombre: p.nombre,
-                mejorVersion: best,
-                momentoDificil: hard,
-                promedio: prom
-            };
-        });
-
         let payload = {
             id_atleta: currentAthlete.id,
             deporte_equipo: currentAthlete.equipo,
             cadencia: tipoEvaluacionGlobal,
-            p1: detalleMental[0].promedio,
-            p2: detalleMental[1].promedio,
-            p3: detalleMental[2].promedio,
-            p4: detalleMental[3].promedio,
-            p5: detalleMental[4].promedio,
-            mental_detalle: detalleMental,
             micro_objetivo: document.getElementById("micro_objetivo").value,
             firma_url: firmaFinal
         };
 
-        let valoresEstrucArr = [];
+        let valoresMentalEvalArr = [];
+        let detalleMentalEvol = [];
 
-        for(let i = 1; i <= 14; i++) {
-            const valSlider = esEvolucion ? 0 : document.getElementById(`s${i}`).value;
+        if (!esEvolucion) {
+            for (let i = 1; i <= 5; i++) {
+                const valM = parseInt(document.getElementById(`p${i}`).value) || 0;
+                payload[`p${i}`] = valM;
+                valoresMentalEvalArr.push(valM);
+            }
+        } else {
+            detalleMentalEvol = pilaresMentalesEvol.map((p) => {
+                const best = parseInt(document.getElementById(`m_best_${p.id}`).value) || 0;
+                const hard = parseInt(document.getElementById(`m_hard_${p.id}`).value) || 0;
+                const prom = parseFloat(((best + hard) / 2).toFixed(1));
+                return {
+                    id: p.id,
+                    nombre: p.nombre,
+                    mejorVersion: best,
+                    momentoDificil: hard,
+                    promedio: prom
+                };
+            });
+            payload.p1 = detalleMentalEvol[0].promedio;
+            payload.p2 = detalleMentalEvol[1].promedio;
+            payload.p3 = detalleMentalEvol[2].promedio;
+            payload.p4 = detalleMentalEvol[3].promedio;
+            payload.p5 = detalleMentalEvol[4].promedio;
+            payload.mental_detalle = detalleMentalEvol;
+        }
+
+        let valoresEstrucArr = [];
+        for (let i = 1; i <= 14; i++) {
+            const valSlider = esEvolucion ? 0 : (parseInt(document.getElementById(`s${i}`).value) || 0);
             payload[`s${i}`] = valSlider;
             valoresEstrucArr.push(valSlider);
         }
@@ -1015,67 +1044,29 @@
                 document.getElementById("rep-equipo").innerText = currentAthlete.equipo;
                 document.getElementById("rep-objetivo").innerText = payload.micro_objetivo || "Sin micro-objetivo especificado.";
 
-                let tablaMentalHtml = `
-                    <tr>
-                        <th>Pilar Mental</th>
-                        <th style="width: 15%; text-align:center;">Mejor Versión</th>
-                        <th style="width: 17%; text-align:center;">Momento Difícil / Error</th>
-                        <th style="width: 22%; text-align:center;">Perfil Prime (10)</th>
-                    </tr>`;
-
-                let bestSum = 0;
-                let hardSum = 0;
-
-                detalleMental.forEach((item) => {
-                    bestSum += item.mejorVersion;
-                    hardSum += item.momentoDificil;
-                    const claseBest = obtenerClaseSemaforo(item.mejorVersion);
-                    const claseHard = obtenerClaseSemaforo(item.momentoDificil);
-                    const distBest = (item.mejorVersion - 10).toFixed(1);
-                    const distHard = (item.momentoDificil - 10).toFixed(1);
-
-                    const badgeBest = item.mejorVersion === 10
-                        ? `<span class="prime-ok" style="padding:1px 5px;border-radius:4px;">Prime</span>`
-                        : `<span class="${obtenerClasePrimeValor(item.mejorVersion)}" style="padding:1px 5px;border-radius:4px;">${distBest}</span>`;
-
-                    const badgeHard = item.momentoDificil === 10
-                        ? `<span class="prime-ok" style="padding:1px 5px;border-radius:4px;">Prime</span>`
-                        : `<span class="${obtenerClasePrimeValor(item.momentoDificil)}" style="padding:1px 5px;border-radius:4px;">${distHard}</span>`;
-
-                    tablaMentalHtml += `
-                        <tr>
-                            <td>${item.nombre}</td>
-                            <td style="text-align:center;font-weight:bold;" class="${claseBest}">${item.mejorVersion}</td>
-                            <td style="text-align:center;font-weight:bold;" class="${claseHard}">${item.momentoDificil}</td>
-                            <td style="text-align:center;font-size:0.78rem;">MV: ${badgeBest} · MD: ${badgeHard}</td>
-                        </tr>`;
-                });
-                document.getElementById("tabla-rep-mental").innerHTML = tablaMentalHtml;
-
-                const pctBest = ((bestSum / 50) * 100).toFixed(1);
-                const pctHard = ((hardSum / 50) * 100).toFixed(1);
-
-                document.getElementById("rep-ideal-best").innerText = `${pctBest}% (${bestSum}/50 pts)`;
-                document.getElementById("rep-ideal-hard").innerText = `${pctHard}% (${hardSum}/50 pts)`;
-
-                aplicarContrasteTarjetaPrime("card-ideal-best", "rep-ideal-best", "rep-brecha-best", bestSum, pctBest);
-                aplicarContrasteTarjetaPrime("card-ideal-hard", "rep-ideal-hard", "rep-brecha-hard", hardSum, pctHard);
-
-                renderRadarChart(detalleMental);
-
-                const mentalSum = detalleMental.reduce((acc, item) => acc + item.promedio, 0);
-                const mentalPorc = ((mentalSum / 50) * 100).toFixed(1);
-
                 const bloqueRepEstruc = document.getElementById("bloque-rep-estructural");
+                const bloqueEvolPrime = document.getElementById("bloque-evolucion-prime");
                 const bloqueZonasRep = document.getElementById("bloque-zonas-rep");
                 const bloqueGraficaEstruc = document.getElementById("bloque-grafica-estruc");
 
-                if (esEvolucion) {
-                    bloqueRepEstruc.classList.add("hidden");
-                    bloqueZonasRep.classList.add("hidden");
-                    bloqueGraficaEstruc.classList.add("hidden");
-                } else {
+                let mentalPorc = 0;
+
+                if (!esEvolucion) {
+                    // MODO EVALUACIÓN (NO COMPARATIVA)
+                    document.getElementById("rep-titulo-mental").innerText = "1. Protocolo Mental (Detalle de Respuestas)";
+                    let tablaMentalHtml = `<tr><th>Pilar / Puntuación</th><th style="width: 15%; text-align:center;">Pts (0-10)</th></tr>`;
+                    nombresPilaresEval.forEach((nombre, idx) => {
+                        let val = valoresMentalEvalArr[idx];
+                        let claseSemaforo = obtenerClaseSemaforo(val);
+                        tablaMentalHtml += `<tr><td>${nombre}</td><td style="text-align:center;font-weight:bold;" class="${claseSemaforo}">${val}</td></tr>`;
+                    });
+                    document.getElementById("tabla-rep-mental").innerHTML = tablaMentalHtml;
+
+                    const mentalSum = valoresMentalEvalArr.reduce((a, b) => a + b, 0);
+                    mentalPorc = ((mentalSum / 50) * 100).toFixed(1);
+
                     bloqueRepEstruc.classList.remove("hidden");
+                    bloqueEvolPrime.classList.add("hidden");
                     bloqueZonasRep.classList.remove("hidden");
                     bloqueGraficaEstruc.classList.remove("hidden");
 
@@ -1087,20 +1078,78 @@
                     });
                     document.getElementById("tabla-rep-estruc").innerHTML = tablaEstrucHtml;
 
-                    let estrucSum = valoresEstrucArr.reduce((a, b) => parseInt(a) + parseInt(b), 0);
-                    let estrucPorc = ((estrucSum / 140) * 100).toFixed(1);
+                    const estrucSum = valoresEstrucArr.reduce((a, b) => a + b, 0);
+                    const estrucPorc = ((estrucSum / 140) * 100).toFixed(1);
 
                     let zonaActivaId = "ZONA_4";
-                    if(parseFloat(mentalPorc) >= 80 && parseFloat(estrucPorc) >= 80) {
+                    if (parseFloat(mentalPorc) >= 80 && parseFloat(estrucPorc) >= 80) {
                         zonaActivaId = "ZONA_1";
-                    } else if(parseFloat(mentalPorc) >= 80 && parseFloat(estrucPorc) < 80) {
+                    } else if (parseFloat(mentalPorc) >= 80 && parseFloat(estrucPorc) < 80) {
                         zonaActivaId = "ZONA_2";
-                    } else if(parseFloat(mentalPorc) < 80 && parseFloat(estrucPorc) >= 80) {
+                    } else if (parseFloat(mentalPorc) < 80 && parseFloat(estrucPorc) >= 80) {
                         zonaActivaId = "ZONA_3";
                     } else {
                         zonaActivaId = "ZONA_4";
                     }
                     renderMatrizZonas(zonaActivaId);
+                } else {
+                    // MODO EVOLUCIÓN (COMPARATIVA + PERFIL PRIME + RADAR)
+                    document.getElementById("rep-titulo-mental").innerText = "1. Protocolo Mental (Mejor Versión vs. Momento Difícil / Error)";
+                    let tablaMentalHtml = `
+                        <tr>
+                            <th>Pilar Mental</th>
+                            <th style="width: 15%; text-align:center;">Mejor Versión</th>
+                            <th style="width: 17%; text-align:center;">Momento Difícil / Error</th>
+                            <th style="width: 22%; text-align:center;">Perfil Prime (10)</th>
+                        </tr>`;
+
+                    let bestSum = 0;
+                    let hardSum = 0;
+
+                    detalleMentalEvol.forEach((item) => {
+                        bestSum += item.mejorVersion;
+                        hardSum += item.momentoDificil;
+                        const claseBest = obtenerClaseSemaforo(item.mejorVersion);
+                        const claseHard = obtenerClaseSemaforo(item.momentoDificil);
+                        const distBest = (item.mejorVersion - 10).toFixed(1);
+                        const distHard = (item.momentoDificil - 10).toFixed(1);
+
+                        const badgeBest = item.mejorVersion === 10
+                            ? `<span class="prime-ok" style="padding:1px 5px;border-radius:4px;">Prime</span>`
+                            : `<span class="${obtenerClasePrimeValor(item.mejorVersion)}" style="padding:1px 5px;border-radius:4px;">${distBest}</span>`;
+
+                        const badgeHard = item.momentoDificil === 10
+                            ? `<span class="prime-ok" style="padding:1px 5px;border-radius:4px;">Prime</span>`
+                            : `<span class="${obtenerClasePrimeValor(item.momentoDificil)}" style="padding:1px 5px;border-radius:4px;">${distHard}</span>`;
+
+                        tablaMentalHtml += `
+                            <tr>
+                                <td>${item.nombre}</td>
+                                <td style="text-align:center;font-weight:bold;" class="${claseBest}">${item.mejorVersion}</td>
+                                <td style="text-align:center;font-weight:bold;" class="${claseHard}">${item.momentoDificil}</td>
+                                <td style="text-align:center;font-size:0.78rem;">MV: ${badgeBest} · MD: ${badgeHard}</td>
+                            </tr>`;
+                    });
+                    document.getElementById("tabla-rep-mental").innerHTML = tablaMentalHtml;
+
+                    const pctBest = ((bestSum / 50) * 100).toFixed(1);
+                    const pctHard = ((hardSum / 50) * 100).toFixed(1);
+
+                    document.getElementById("rep-ideal-best").innerText = `${pctBest}% (${bestSum}/50 pts)`;
+                    document.getElementById("rep-ideal-hard").innerText = `${pctHard}% (${hardSum}/50 pts)`;
+
+                    aplicarContrasteTarjetaPrime("card-ideal-best", "rep-ideal-best", "rep-brecha-best", bestSum, pctBest);
+                    aplicarContrasteTarjetaPrime("card-ideal-hard", "rep-ideal-hard", "rep-brecha-hard", hardSum, pctHard);
+
+                    renderRadarChart(detalleMentalEvol);
+
+                    const mentalSum = detalleMentalEvol.reduce((acc, item) => acc + item.promedio, 0);
+                    mentalPorc = ((mentalSum / 50) * 100).toFixed(1);
+
+                    bloqueRepEstruc.classList.add("hidden");
+                    bloqueEvolPrime.classList.remove("hidden");
+                    bloqueZonasRep.classList.add("hidden");
+                    bloqueGraficaEstruc.classList.add("hidden");
                 }
 
                 let historialFinal = result.history;
