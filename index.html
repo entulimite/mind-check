@@ -55,6 +55,15 @@
             font-size: 0.92rem;
             background: #fff;
         }
+        .nota-persistencia {
+            background: #eef4fc;
+            border-left: 4px solid var(--primary);
+            padding: 10px 14px;
+            border-radius: 5px;
+            font-size: 0.84rem;
+            color: #1f3a5f;
+            margin-bottom: 12px;
+        }
         .pilar-card {
             background: #fff;
             padding: 12px 15px;
@@ -446,8 +455,8 @@
 
         <!-- MODO EVOLUCIÓN (COMPARATIVA VS MEJOR VERSIÓN) -->
         <div id="mental-evol-mode" class="hidden">
-            <div style="font-size: 0.82rem; color: #666; margin-bottom: 12px;">
-                Califica del 0 al 10 cada pilar en <strong>Tu mejor versión</strong> y en <strong>Tu peor momento / momento más difícil o error</strong>.
+            <div class="nota-persistencia">
+                <strong>Tu mejor versión</strong> ya viene cargada por defecto con tus calificaciones guardadas: <strong>solo muévela si deseas cambiar algo</strong>. Enfócate en registrar cómo estás hoy en <strong>Peor momento / momento difícil o error</strong>.
             </div>
             <div id="mental-sliders"></div>
         </div>
@@ -690,6 +699,44 @@
         }
     ];
 
+    function claveMejorVersionAtleta() {
+        const id = (currentAthlete && currentAthlete.id) ? String(currentAthlete.id).trim().toLowerCase() : "default";
+        return `entulimite_mv_${id}`;
+    }
+
+    function obtenerMejorVersionGuardada(serverData) {
+        if (serverData && Array.isArray(serverData.best_version) && serverData.best_version.length === 5) {
+            return serverData.best_version.map(v => Math.max(0, Math.min(10, parseInt(v) || 5)));
+        }
+        try {
+            const raw = localStorage.getItem(claveMejorVersionAtleta());
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed) && parsed.length === 5) {
+                    return parsed.map(v => Math.max(0, Math.min(10, parseInt(v) || 5)));
+                }
+            }
+        } catch (err) {}
+        return [5, 5, 5, 5, 5];
+    }
+
+    function guardarMejorVersionLocal(valoresBest) {
+        try {
+            localStorage.setItem(claveMejorVersionAtleta(), JSON.stringify(valoresBest));
+        } catch (err) {}
+    }
+
+    function cargarMejorVersionEnSliders(valoresBest) {
+        pilaresMentalesEvol.forEach((p, idx) => {
+            const val = valoresBest[idx] !== undefined ? valoresBest[idx] : 5;
+            const inputBest = document.getElementById(`m_best_${p.id}`);
+            if (inputBest) {
+                inputBest.value = val;
+                actualizarPilarMental(p.id);
+            }
+        });
+    }
+
     function formatearDifMejorVersion(best, hard) {
         const diff = parseFloat((hard - best).toFixed(1));
         if (diff === 0) return "0.0 (Al nivel de tu mejor versión)";
@@ -712,7 +759,7 @@
                 <div class="pilar-subgrid">
                     <div class="slider-box">
                         <div class="slider-top">
-                            <span>Tu mejor versión</span>
+                            <span>Tu mejor versión (guardada)</span>
                             <span id="vm_best_${p.id}" class="slider-val">5</span>
                         </div>
                         <div class="slider-row">
@@ -995,6 +1042,9 @@
                 const valorSugerido = data.isInitial ? "Evaluación" : "Evolución";
                 document.getElementById("tipo_registro").value = valorSugerido;
 
+                const mejorVersionGuardada = obtenerMejorVersionGuardada(data);
+                cargarMejorVersionEnSliders(mejorVersionGuardada);
+
                 document.getElementById("step-auth").classList.add("hidden");
                 document.getElementById("eval-form").classList.remove("hidden");
                 actualizarTipoRegistro();
@@ -1063,6 +1113,7 @@
                     promedio: prom
                 };
             });
+            guardarMejorVersionLocal(detalleMentalEvol.map(item => item.mejorVersion));
             payload.p1 = detalleMentalEvol[0].promedio;
             payload.p2 = detalleMentalEvol[1].promedio;
             payload.p3 = detalleMentalEvol[2].promedio;
