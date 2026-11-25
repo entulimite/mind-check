@@ -338,9 +338,11 @@
         <div class="slider-container"><label>4. Visualización de Ejecución (Proyecto mentalmente la ejecución correcta)</label><input type="range" min="0" max="10" value="5" id="p4" oninput="updateVal('p4', 'v4')"><span id="v4" class="slider-val">5</span></div>
         <div class="slider-container"><label>5. Agradecimiento y Disfrute (Disfruto independientemente del resultado)</label><input type="range" min="0" max="10" value="5" id="p5" oninput="updateVal('p5', 'v5')"><span id="v5" class="slider-val">5</span></div>
 
-        <div class="ficha-section-title">2. Soporte Estructural Deportivo (14 Factores de Base)</div>
-        <div style="font-size: 0.82rem; color: #666; margin-bottom: 10px;">Valora del 0 al 10 el cumplimiento real de tus bases:</div>
-        <div id="structural-sliders"></div>
+        <div id="seccion-estructural-form">
+            <div class="ficha-section-title">2. Soporte Estructural Deportivo (14 Factores de Base)</div>
+            <div style="font-size: 0.82rem; color: #666; margin-bottom: 10px;">Valora del 0 al 10 el cumplimiento real de tus bases:</div>
+            <div id="structural-sliders"></div>
+        </div>
 
         <div class="ficha-section-title">3. Compromiso y Validación</div>
         <div class="form-group">
@@ -401,19 +403,21 @@
         </table>
 
         <!-- DESGLOSE DETALLADO 2: SOPORTE ESTRUCTURAL (14 FACTORES) -->
-        <div class="ficha-section-title">2. Soporte Estructural Deportivo (Detalle de Respuestas)</div>
-        <table class="ficha-table" id="tabla-rep-estruc">
-            <tr><th>Factor Estructural / Puntuación</th><th style="width: 15%; text-align:center;">Pts (0-10)</th></tr>
-        </table>
+        <div id="bloque-rep-estructural">
+            <div class="ficha-section-title">2. Soporte Estructural Deportivo (Detalle de Respuestas)</div>
+            <table class="ficha-table" id="tabla-rep-estruc">
+                <tr><th>Factor Estructural / Puntuación</th><th style="width: 15%; text-align:center;">Pts (0-10)</th></tr>
+            </table>
+        </div>
 
         <!-- MÉTRICAS IFMI -->
         <div class="ficha-section-title">3. Índice de Fortaleza Mental Integrado (IFMI) & Matriz de Diagnóstico</div>
-        <div class="ficha-grid-3">
+        <div class="ficha-grid-3" id="grid-metricas-rep">
             <div class="ficha-card">
                 <div class="ficha-card-label">1. Dominio Mental (/50 pts)</div>
                 <div class="ficha-card-val" id="rep-mental-val">0%</div>
             </div>
-            <div class="ficha-card">
+            <div class="ficha-card" id="card-estruc-rep">
                 <div class="ficha-card-label">2. Soporte Estructural (/140 pts)</div>
                 <div class="ficha-card-val" id="rep-estruc-val">0%</div>
             </div>
@@ -424,8 +428,10 @@
         </div>
 
         <!-- TODAS LAS ZONAS VISIBLES (RESALTANDO LA ZONA ASIGNADA) -->
-        <div class="ficha-section-title">4. Matriz Completa de Zonas y Estrategia</div>
-        <div id="zonas-completas" class="zonas-grid"></div>
+        <div id="bloque-zonas-rep">
+            <div class="ficha-section-title">4. Matriz Completa de Zonas y Estrategia</div>
+            <div id="zonas-completas" class="zonas-grid"></div>
+        </div>
 
         <!-- MICRO-OBJETIVO -->
         <div class="ficha-section-title">Compromiso de Acción: Micro-objetivo (Próximas 2 semanas)</div>
@@ -457,9 +463,11 @@
             <canvas id="chartMental"></canvas>
         </div>
 
-        <div style="font-size: 0.8rem; font-weight: bold; color: var(--primary); margin-bottom: 5px;">GRÁFICA 2: EVOLUCIÓN DE SOPORTE ESTRUCTURAL (0 a 140 pts / % Estructural)</div>
-        <div style="position: relative; height:150px; width:100%; margin-bottom: 15px;">
-            <canvas id="chartEstruc"></canvas>
+        <div id="bloque-grafica-estruc">
+            <div style="font-size: 0.8rem; font-weight: bold; color: var(--primary); margin-bottom: 5px;">GRÁFICA 2: EVOLUCIÓN DE SOPORTE ESTRUCTURAL (0 a 140 pts / % Estructural)</div>
+            <div style="position: relative; height:150px; width:100%; margin-bottom: 15px;">
+                <canvas id="chartEstruc"></canvas>
+            </div>
         </div>
 
         <div style="font-size: 0.8rem; font-weight: bold; color: var(--primary); margin-bottom: 5px;">GRÁFICA 3: EVOLUCIÓN PROMEDIO INTEGRADO IFMI (0% a 100%)</div>
@@ -561,9 +569,20 @@
     function actualizarTipoRegistro() {
         const selectEl = document.getElementById("tipo_registro");
         tipoEvaluacionGlobal = selectEl ? selectEl.value : "Evaluación";
+        const esEvolucion = tipoEvaluacionGlobal === "Evolución";
+
         document.getElementById("form-tipo-eval").innerText = `${tipoEvaluacionGlobal} | Mind-Check`;
         if (currentAthlete && currentAthlete.nombre) {
             document.getElementById("athlete-info").innerText = `Atleta: ${currentAthlete.nombre} | Equipo/Disciplina: ${currentAthlete.equipo} | Tipo: ${tipoEvaluacionGlobal}`;
+        }
+
+        const secEstructuralForm = document.getElementById("seccion-estructural-form");
+        if (secEstructuralForm) {
+            if (esEvolucion) {
+                secEstructuralForm.classList.add("hidden");
+            } else {
+                secEstructuralForm.classList.remove("hidden");
+            }
         }
     }
 
@@ -653,12 +672,10 @@
                 currentAthlete = { id: id, nombre: data.nombre, equipo: data.equipo, isInitial: data.isInitial };
                 const valorSugerido = data.isInitial ? "Evaluación" : "Evolución";
                 document.getElementById("tipo_registro").value = valorSugerido;
-                tipoEvaluacionGlobal = valorSugerido;
 
-                document.getElementById("form-tipo-eval").innerText = `${tipoEvaluacionGlobal} | Mind-Check`;
                 document.getElementById("step-auth").classList.add("hidden");
                 document.getElementById("eval-form").classList.remove("hidden");
-                document.getElementById("athlete-info").innerText = `Atleta: ${data.nombre} | Equipo/Disciplina: ${data.equipo} | Tipo: ${tipoEvaluacionGlobal}`;
+                actualizarTipoRegistro();
             } else {
                 msgDiv.innerHTML = `<div class="alert alert-error">Correo no encontrado o inactivo en la base de datos.</div>`;
             }
@@ -674,6 +691,7 @@
         btn.disabled = true;
 
         tipoEvaluacionGlobal = document.getElementById("tipo_registro").value || "Evaluación";
+        const esEvolucion = tipoEvaluacionGlobal === "Evolución";
 
         let firmaFinal = "";
         let sigBoxAtleta = document.getElementById("sig-box-atleta");
@@ -703,9 +721,10 @@
         let valoresMentalArr = [payload.p1, payload.p2, payload.p3, payload.p4, payload.p5];
         let valoresEstrucArr = [];
 
-        for(let i = 1; i <= 14; i++) { 
-            payload[`s${i}`] = document.getElementById(`s${i}`).value; 
-            valoresEstrucArr.push(payload[`s${i}`]);
+        for(let i = 1; i <= 14; i++) {
+            const valSlider = esEvolucion ? 0 : document.getElementById(`s${i}`).value;
+            payload[`s${i}`] = valSlider;
+            valoresEstrucArr.push(valSlider);
         }
 
         try {
@@ -730,47 +749,68 @@
                 });
                 document.getElementById("tabla-rep-mental").innerHTML = tablaMentalHtml;
 
-                let tablaEstrucHtml = `<tr><th>Factor Estructural / Puntuación</th><th style="text-align:center;">Pts (0-10)</th></tr>`;
-                factoresEstructurales.forEach((nombre, idx) => {
-                    let val = valoresEstrucArr[idx];
-                    let claseSemaforo = obtenerClaseSemaforo(val);
-                    tablaEstrucHtml += `<tr><td>${nombre}</td><td style="text-align:center;font-weight:bold;" class="${claseSemaforo}">${val}</td></tr>`;
-                });
-                document.getElementById("tabla-rep-estruc").innerHTML = tablaEstrucHtml;
-
                 let mentalSum = valoresMentalArr.reduce((a, b) => parseInt(a) + parseInt(b), 0);
                 let mentalPorc = ((mentalSum / 50) * 100).toFixed(1);
-                
-                let estrucSum = valoresEstrucArr.reduce((a, b) => parseInt(a) + parseInt(b), 0);
-                let estrucPorc = ((estrucSum / 140) * 100).toFixed(1);
-
-                let ifmi = ((parseFloat(mentalPorc) + parseFloat(estrucPorc)) / 2).toFixed(1);
-
                 document.getElementById("rep-mental-val").innerText = mentalPorc + "% (" + mentalSum + "/50)";
-                document.getElementById("rep-estruc-val").innerText = estrucPorc + "% (" + estrucSum + "/140)";
-                document.getElementById("rep-ifmi").innerText = ifmi + "%";
 
-                let zonaActivaId = "ZONA_4";
-                if(parseFloat(mentalPorc) >= 80 && parseFloat(estrucPorc) >= 80) {
-                    zonaActivaId = "ZONA_1";
-                } else if(parseFloat(mentalPorc) >= 80 && parseFloat(estrucPorc) < 80) {
-                    zonaActivaId = "ZONA_2";
-                } else if(parseFloat(mentalPorc) < 80 && parseFloat(estrucPorc) >= 80) {
-                    zonaActivaId = "ZONA_3";
+                const bloqueRepEstruc = document.getElementById("bloque-rep-estructural");
+                const cardEstrucRep = document.getElementById("card-estruc-rep");
+                const gridMetricas = document.getElementById("grid-metricas-rep");
+                const bloqueZonasRep = document.getElementById("bloque-zonas-rep");
+                const bloqueGraficaEstruc = document.getElementById("bloque-grafica-estruc");
+
+                let ifmi = mentalPorc;
+
+                if (esEvolucion) {
+                    bloqueRepEstruc.classList.add("hidden");
+                    cardEstrucRep.classList.add("hidden");
+                    bloqueZonasRep.classList.add("hidden");
+                    bloqueGraficaEstruc.classList.add("hidden");
+                    gridMetricas.style.gridTemplateColumns = "repeat(2, 1fr)";
+                    document.getElementById("rep-ifmi").innerText = ifmi + "%";
                 } else {
-                    zonaActivaId = "ZONA_4";
-                }
+                    bloqueRepEstruc.classList.remove("hidden");
+                    cardEstrucRep.classList.remove("hidden");
+                    bloqueZonasRep.classList.remove("hidden");
+                    bloqueGraficaEstruc.classList.remove("hidden");
+                    gridMetricas.style.gridTemplateColumns = "repeat(3, 1fr)";
 
-                renderMatrizZonas(zonaActivaId);
+                    let tablaEstrucHtml = `<tr><th>Factor Estructural / Puntuación</th><th style="text-align:center;">Pts (0-10)</th></tr>`;
+                    factoresEstructurales.forEach((nombre, idx) => {
+                        let val = valoresEstrucArr[idx];
+                        let claseSemaforo = obtenerClaseSemaforo(val);
+                        tablaEstrucHtml += `<tr><td>${nombre}</td><td style="text-align:center;font-weight:bold;" class="${claseSemaforo}">${val}</td></tr>`;
+                    });
+                    document.getElementById("tabla-rep-estruc").innerHTML = tablaEstrucHtml;
+
+                    let estrucSum = valoresEstrucArr.reduce((a, b) => parseInt(a) + parseInt(b), 0);
+                    let estrucPorc = ((estrucSum / 140) * 100).toFixed(1);
+                    ifmi = ((parseFloat(mentalPorc) + parseFloat(estrucPorc)) / 2).toFixed(1);
+
+                    document.getElementById("rep-estruc-val").innerText = estrucPorc + "% (" + estrucSum + "/140)";
+                    document.getElementById("rep-ifmi").innerText = ifmi + "%";
+
+                    let zonaActivaId = "ZONA_4";
+                    if(parseFloat(mentalPorc) >= 80 && parseFloat(estrucPorc) >= 80) {
+                        zonaActivaId = "ZONA_1";
+                    } else if(parseFloat(mentalPorc) >= 80 && parseFloat(estrucPorc) < 80) {
+                        zonaActivaId = "ZONA_2";
+                    } else if(parseFloat(mentalPorc) < 80 && parseFloat(estrucPorc) >= 80) {
+                        zonaActivaId = "ZONA_3";
+                    } else {
+                        zonaActivaId = "ZONA_4";
+                    }
+                    renderMatrizZonas(zonaActivaId);
+                }
 
                 let historialFinal = result.history;
                 if (!historialFinal || historialFinal.length === 0) {
                     const mesesNombres = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
                     let mesActualStr = mesesNombres[new Date().getMonth()];
-                    historialFinal = [{month: mesActualStr, mental: mentalPorc, estruc: estrucPorc, ifmi: ifmi}];
+                    historialFinal = [{month: mesActualStr, mental: mentalPorc, estruc: 0, ifmi: ifmi}];
                 }
 
-                renderRealCronologyChart(historialFinal);
+                renderRealCronologyChart(historialFinal, esEvolucion);
             } else {
                 alert("Error al guardar: " + result.message);
                 btn.innerText = "Generar Ficha de Reporte Oficial";
@@ -783,7 +823,7 @@
         }
     }
 
-    function renderRealCronologyChart(historyArray) {
+    function renderRealCronologyChart(historyArray, esEvolucion) {
         if (!historyArray || !Array.isArray(historyArray) || historyArray.length === 0) {
             return;
         }
@@ -858,11 +898,13 @@
             options: commonOptions
         });
 
-        chartEstrucInst = new Chart(document.getElementById('chartEstruc').getContext('2d'), {
-            type: 'line',
-            data: { labels: labels, datasets: [{ label: '% Estructural', data: dataE, borderColor: '#3E5F90', backgroundColor: 'rgba(62, 95, 144, 0.1)', borderWidth: 2, fill: true, tension: 0.2, spanGaps: false }] },
-            options: commonOptions
-        });
+        if (!esEvolucion) {
+            chartEstrucInst = new Chart(document.getElementById('chartEstruc').getContext('2d'), {
+                type: 'line',
+                data: { labels: labels, datasets: [{ label: '% Estructural', data: dataE, borderColor: '#3E5F90', backgroundColor: 'rgba(62, 95, 144, 0.1)', borderWidth: 2, fill: true, tension: 0.2, spanGaps: false }] },
+                options: commonOptions
+            });
+        }
 
         chartIfmiInst = new Chart(document.getElementById('chartIfmi').getContext('2d'), {
             type: 'line',
